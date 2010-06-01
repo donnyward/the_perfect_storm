@@ -1,0 +1,110 @@
+﻿Perfect Storm
+Technical Document
+Requirements: 
+1.The program must be able to run on Linux. The last step will be porting to Windows.
+2.The program must not require any additional files/dependencies, and it needs to be small. 
+3.It should be controlled exclusively by the keyboard.
+4.The game is for one or two human players.
+Overview Of Design: 
+The game will be written in C. It will be as object oriented and modular as possible. There will be structs for the tetrominos which are combinations of squares, which are also structs, and the game module which processes all input. 
+Drawing: 
+The game will utilize SDL for portability between Windows and Linux, the target operating systems. The game will use standard shape drawing functions if the SDL library is capable, eventually using art. Each tetromino will consist of one or more squares. The game window will consist of art with spaces for information such as current score.
+Input: 
+The keyboard will be used for all input. Enter and escape go forward or back through menus. Enter will also speed the falling of the tetromino in game play. Arrow keys guide the falling tetrominos. The up arrow will not do anything in game play. Holding more then one arrow key at a time does nothing.
+Logic: 
+The playing field is 10x18 (x, y). The bottom left corner is coordinate (0, 0). The top right corner is then (9, 17).
+High scores are stored in a binary file. If no high score file is found, a new default one with hardcoded generic high scores is created.
+Every falling tetromino spawned will be dynamically allocated. Tetrominos only exist as they fall. Once a tetromino comes to rest, all of its component blocks are unlinked and the tetromino parent is removed from memory. Tetrominos will periodically be called to move down, until one of their component blocks can move no farther, at which point the tetromino ceases to exist, and all that remains are its sleeping blocks. Every time a tetromino goes to sleep, the game will check to see if any rows are filled with same type blocks, at which point the row disappears and the above blocks recursively wake, fall, sleep, for as many rows as were cleared or until they hit another block, whichever comes first. Blocks will fall as per gravity until they hit the ground or a block. At certains scores, a new level is reached (speeding up the descent of tetrominos). After beating level 15 the game ends.
+
+Starting coordinates for each block (left to right, top to bottom blocks):
+I: (3, 16), (4, 16), (5, 16), (6, 16)
+J: (3, 16), (4, 16), (5, 16), (5, 15)
+L: (3, 16), (4, 16), (5, 16), (3, 15)
+O: (4, 16), (5, 16), (4, 15), (5, 15)
+S: (4, 16), (5, 16), (3, 15), (4, 15)
+T: (3, 16), (4, 16), (5, 16), (4, 15)
+Z: (3, 16), (4, 16), (4, 15), (5, 15)
+Project Break Down: 
+The project will contain 9 files. The tetrominos will consist of a header and a source file. The blocks will have their own header and source. The main game loop will be a source file with the main function. The menu will consist of a header and a source file. The game module (which processes input and manages the game data and whats on the screen) will consist of a header and source file, and utilize the SDL.
+Tetrominos:
+Struct block
+Properties:
+It’s coordinate
+The tetromino its linked to (if NULL, block has no parent)
+Whether or not its asleep
+
+Methods:
+All move functions return 1 on success and 0 on fail
+block_move - used internally by game. tries to teleport to a specific coordinate (x and y coords are arguments)
+block_moveDown – moves this block down
+block_moveLeft – moves this block left
+block_moveRight – moves this block right
+block_create – creates a new block. Returns a pointer to a new block.
+block_clear – removes this block. must not have a parent tetromino in order to work.
+block_getLoc – returns the x and y coordinates of this block
+block_setLoc – set x and y coordinates of this block
+block_isSleep – returns 1 on sleeping, 0 on awake
+
+Struct tetromino
+Properties:
+Size 4 array pointing to its 4 component blocks
+Name type of tetromino (I, J, L, O, S, T, Z)
+
+Methods:
+All move functions return 1 on success and 0 on fail
+tetro_move - used internally by game. tries to teleport to a specific coordinate (x and y coords are arguments)
+tetro_moveDown – move this tetro down
+tetro_moveLeft – move this tetro left
+tetro_moveRight – move this tetro right
+tetro_moveStart - teleport tetromino to starting position at top. if this fails the game ends
+tetro_create(name of tetro) – creates a new tetromino with shape specified, creates component blocks, and links/positions them properly.
+tetro_clear – put child blocks to sleep, unlink child blocks, free tetromino from memory, and call the next tetromino into existence
+tetro_rotate - rotate the tetromino 90 degrees. 1 on success 0 on fail.
+
+Game Module:
+Struct gameModule
+Properties:
+-Current level and score
+-Whether or not the game is paused
+-Whether the game is playing or in menu
+-Pointer to next tetromino (the one that will be put up when the current one is cleared)
+-2dimensional array of pointers to blocks (each element in the array represents an x,y on the playing grid, null if no block there).
+-Pointer to the current tetromino (the one that’s falling right now)
+
+Methods:
+game_getScore – returns the current score of the player (integer)
+game_getLevel – returns the current level the player is on (integer)
+game_getBlockAtPos – returns a pointer to the block that is at a specific coordinate (using the 2d array). Returns null if no block there.
+game_setBlockToPos – takes a pointer to a block, x, and y coordinates, and attempts to place that block at this position in the array, will also remove block from previous position if move is possible. Returns 1 on successful set, 0 on fail. fails when a block is already occupying the intended destination.
+game_removeBlockAtPos – takes x and y coordinates, and removes the block from that point on the array list.
+game_draw – gets the current score, level, position of all blocks, debug messages (if applicable) and draws them to the screen.
+game_getInput – awaits player input, and either rotates the tetromino or moves the tetromino (else do nothing)
+game_pause - pauses game, suspends everything, pops up menu with "resume" or "quit"
+game_clear - ends current game. an argument will be passed to tell the game if the game ended because the player quit or because the player lost (or the player won)..
+game_create - loads the game part of the game, and begins game play.
+
+Menu:
+
+Methods:
+menu_getInput - waits for valid input from keyboard (up/down arrow, escape and enter) and returns the input once a valid one is entered.
+menu_up - attempt moves up a selection on the current menu. does not loop to bottom from top. 1 on success, 0 on fail
+menu_down - attempt moves down a selection on the current menu. does not loop to top from bottom. 1 on success, 0 on fail
+menu_newGame - called when enter is pushed and new game is selected. Sets up a new game.
+menu_highScores - called when no input is entered for a long time, or entered in the menu. displays high scores until input is received (if called with enter), or only for a period of time if it was called due to inactivity.
+menu_clear - exits the menu, clearing all of its data. called to exit to windows or to start a game up.
+menu_create - starts up the main menu from the beginning. called by main
+
+
+Main file:
+Properties:
+-global variable for debugmode
+
+Methods:
+main - main game loop. loads menu, manages the navigation of it. starts game when told to and waits for it to end before restarting loop. exiting the gameplay goes back to the top of the loop (new menu). exiting the menu skips the gameplay and ends the game.
+debug_msg - takes a c-string and displays it in the debug message box.
+
+
+
+Future Considerations: 
+In the future, the game might allow the addition of network play or 2 player split screen on the same computer. When the game is complete, consider adapting the game to DirectX and OpenGL.
+
