@@ -18,7 +18,7 @@ int main(int argc, char * argv[])
 
 
 	//init screen surface
-	if ( SDL_Init( SDL_INIT_EVERYTHING ) < 1 ) //init basics (event handling, filei/o and threading) + video + timer (for constant update rate)
+	if ( SDL_Init( SDL_INIT_EVERYTHING ) != 0 ) //init basics (event handling, filei/o and threading) + video + timer (for constant update rate)
 	{
 		printf("Error initializing SDL. Reason: %s\n", SDL_GetError()); // <1 = fail
 		exit(-1);
@@ -35,12 +35,12 @@ int main(int argc, char * argv[])
 	//draw a bmp on the screen
 	draw_bmp("splash.bmp");
 
+	printf("Will exit in 5...\n");
 
 
+	SDL_Delay(5000); //wait, to see image for a bit
 
-	SDL_Delay(3000); //wait, to see image for a bit
-
-	printf("Exiting program...");
+	printf("Exiting program...\n");
 //	getch();
 	SDL_Quit(); //unload sdl library
 	return 0;
