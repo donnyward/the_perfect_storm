@@ -9,7 +9,7 @@
 int debugMode = 0;
 
 SDL_Surface * screen; //the screen surface
-	
+
 void debug_msg(char msg[]);
 int draw_bmp(char * filename);
 
@@ -18,9 +18,9 @@ int main(int argc, char * argv[])
 
 
 	//init screen surface
-	if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) < 1 ) //init basics (event handling, filei/o and threading) + video + timer (for constant update rate)
+	if ( SDL_Init( SDL_INIT_EVERYTHING ) < 1 ) //init basics (event handling, filei/o and threading) + video + timer (for constant update rate)
 	{
-		fprintf(stderr, "Error initializing SDL: %s\n", SDL_GetError()); // <1 = fail
+		printf("Error initializing SDL. Reason: %s\n", SDL_GetError()); // <1 = fail
 		exit(-1);
 	}
 
@@ -31,16 +31,16 @@ int main(int argc, char * argv[])
 		fprintf(stderr, "Error setting video mode to %dx%d, %d bit depth: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, BIT_DEPTH, SDL_GetError());
 		exit(-1);
 	}
-	
+
 	//draw a bmp on the screen
 	draw_bmp("splash.bmp");
-	
-	
-	
-	
+
+
+
+
 	SDL_Delay(3000); //wait, to see image for a bit
-	
-//	printf("Press enter to exit program...");
+
+	printf("Exiting program...");
 //	getch();
 	SDL_Quit(); //unload sdl library
 	return 0;
@@ -49,27 +49,27 @@ int main(int argc, char * argv[])
 int draw_bmp(char * filename)
 {
 	SDL_Surface * image;
-	
+
 	image = SDL_LoadBMP(filename);
 	if (image == NULL) //fail
 	{
 		fprintf(stderr, "Error loading image \"%s\"\n", filename);
 		return 0;
 	}
-	
+
 	//if the image has a palette then use that to make colors better
 	if (image->format->palette && screen->format->palette)
 	{
 		SDL_SetColors(screen, image->format->palette->colors, 0, image->format->palette->ncolors);
 	}
-	
+
 	//blit image onto screen surface
 	if (SDL_BlitSurface(image, NULL, screen, NULL) < 0 ) //<0 = fail
 		fprintf(stderr, "Image failed to blit: %s\n", SDL_GetError());
-		
+
 	//updated modified part of screen
 	SDL_UpdateRect(screen, 0, 0, image->w, image->h);
-	
+
 	//free space allocated to bmp (its already on screen i guess)
 	SDL_FreeSurface(image);
 	return 1;
