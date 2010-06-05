@@ -11,8 +11,8 @@ EXECUTABLE = ps
 #all : $(OBJECTS)
 #	$(CC) $(OBJECTS) -o $(EXECUTABLE) $(LIBS)
 	
-game : main.o game.o block.o
-	gcc main.o game.o block.o -o `sdl-config --cflags --libs` ps 
+game : main.o game.o block.o tetromino.o
+	gcc main.o game.o block.o -o tetromino.o `sdl-config --cflags --libs` -o ps 
 	
 main.o : main.c
 	gcc -c main.c
@@ -22,6 +22,9 @@ game.o : game.c
 	
 block.o : block.c
 	gcc -c block.c
+	
+tetromino.o : tetromino.c
+	gcc -c tetromino.c
 	
 clean :
 	rm ps $(OBJECTS)

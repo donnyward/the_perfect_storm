@@ -1,7 +1,7 @@
 #include "block.h"
 #include "tetromino.h"
 #include "types.h"
-
+#include "stdlib.h" //for malloc and NULL
 
 
 tetromino * tetro_create(tetroShape_t type)
@@ -56,7 +56,7 @@ boolean tetro_move(tetromino * t, dir_t dir)
 	for ( i = 0; i < TETRO_SIZE; i++ )
 	{
 		b = t->children[i];
-		x = start_coords[type][i][x][y];
+//		x = start_coords[type][i][x][y];
 		//block_teleport(b, 
 		//x = block_getLocX(b);
 		//y = block_getLocY(b);
@@ -75,8 +75,8 @@ boolean tetro_moveStart(tetromino * t)
 	{
 		b = t->children[i];
 		//try writing the data to a binary file?
-		x = start_coords[type][i].x;
-		y = start_coords[type][i].y;
+//		x = start_coords[type][i].x;
+//		y = start_coords[type][i].y;
 		
 		if ( !block_teleport(b, x, y) )
 			return false;

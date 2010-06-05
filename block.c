@@ -1,5 +1,7 @@
 #include "block.h"
 #include "types.h"
+#include "tetromino.h"
+#include "stdlib.h"
 
 block * block_create(tetroShape_t type, tetromino * parent)
 {
@@ -47,14 +49,14 @@ THIS CODE IS ALREADY HANDLED BY game_setBlockToPos
 	}
 */
 
-	return game_setBlockToPos(b, x, y);
+	return g_setBlockToPos(b, x, y);
 }
 
 
 boolean block_move(block * b, dir_t dir)
 {
 	int x = block_getLocX(b);
-	int y = block_getLocy(b);
+	int y = block_getLocY(b);
 	
 	if ( dir == dir_left )
 	{
