@@ -1,20 +1,22 @@
 #ifndef __MENU_H__
 #def __MENU_H__
 
-enum highScoresReason_e
+#include "types.h"
+
+typedef enum
 {
 	reason_idle, //player was idle (no input) for a period of time
 	reason_chosen, //player explicitly chose to view high scores
-}
+} highScoresReason_t
 
 
-int menu_getInput();
+int m_getInput();
 
-int menu_up();
-int menu_down();
-int menu_newGame();
-int menu_highScores(int highScoresReason);
-int menu_clear();
-int menu_create();
+int m_up();
+int m_down();
+int m_newGame();
+int m_highScores(highScoresReason_t r);
+int m_clear();
+int m_create();
 
 #endif

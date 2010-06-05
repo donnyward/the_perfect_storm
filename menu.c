@@ -1,29 +1,29 @@
 #include "menu.h"
 
-int menu_getInput()
+int m_getInput()
 {
 }
 
-int menu_up()
+int m_up()
 {
 }
 
-int menu_down()
+int m_down()
 {
 }
 
-int menu_newGame()
+int m_newGame()
 {
 }
 
-int menu_highScores(int highScoresReason)
+int m_highScores(int highScoresReason)
 {
 }
 
-int menu_clear()
+int m_clear()
 {
 }
 
-int menu_create()
+int m_create()
 {
 }

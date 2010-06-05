@@ -57,7 +57,7 @@ boolean tetro_move(tetromino * t, dir_t dir)
 	{
 		b = t->children[i];
 		x = start_coords[type][i][x][y];
-		block_teleport(b, 
+		//block_teleport(b, 
 		//x = block_getLocX(b);
 		//y = block_getLocY(b);
 	}

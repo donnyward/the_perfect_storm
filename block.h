@@ -2,21 +2,22 @@
 #define __BLOCK_H__
 
 #include "types.h"
+//#include "tetromino.h"
 
-struct tetromino; //declaration here because it is used below by block definition
+struct tetromino; //forward declaration here because it is used below by block definition
 
 typedef struct block
 {
 	//coordinates of block
 	int x;
 	int y;
-	tetromino * parent; //pointer to the parent tetromino object
+	struct tetromino * parent; //pointer to the parent tetromino object
 	boolean sleep; //a sleeping block doesnt move or do much of anything
 	tetroShape_t type; //the type of block, corresponds to the type of tetromino it is or was a part of (or blank if it is created to fill the screen upon losing)
 } block;
 
 //creates a new block. returns a pointer to the new block. returns null if block wasnt created properly
-block * block_create(tetroShape_t type, tetromino * parent);
+block * block_create(tetroShape_t type, struct tetromino * parent);
 
 //removes a block *b. returns true if successfully removed. fails if block still has a parent.
 boolean block_clear(block * b);
@@ -49,10 +50,10 @@ boolean block_doSleep(block * b);
 boolean block_doWake(block * b);
 
 //returns a pointer to the parent of this block
-tetromino * block_getParent(block * b);
+struct tetromino * block_getParent(block * b);
 
 //sets the parent of a block to the tetromino given in the arguments
-void block_setParent(block * b, tetromino * parent);
+void block_setParent(block * b, struct tetromino * parent);
 
 //sets type of a block to a tetroShape_t type. returns false if a bad type is given.
 boolean block_setType(block * b, tetroShape_t type);

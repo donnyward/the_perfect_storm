@@ -16,6 +16,8 @@
 #define TETRO_SIZE 4 //how many blocks make up a tetromino
 #define TETRO_SHAPES 7
 
+#define DEBUG_MODE 1 //enables debug messages printed to terminal
+
 //boolean type, accepts true or false
 typedef enum
 {
@@ -54,12 +56,12 @@ typedef enum
 
 //the start position for each child block of the different shaped tetrominos
 //blocks 1-4 go from left to right, top to bottom (like reading)
-typedef struct pt
+typedef struct
 {
 	short x;
 	short y;
 } pt;
-
+/*
 pt start_coords[TETRO_SHAPES][TETRO_SIZE];
 
 start_coords[tetro_I][0].x = 3;
@@ -124,6 +126,6 @@ start_coords[tetro_Z][2].x = 4;
 start_coords[tetro_Z][2].y = 15;
 start_coords[tetro_Z][3].x = 5;
 start_coords[tetro_Z][3].y = 15;
-
+*/
 
 #endif
