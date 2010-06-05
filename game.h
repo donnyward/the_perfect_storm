@@ -21,16 +21,20 @@ typedef struct gameModule
 -Whether the game is playing or in menu
 -Pointer to next tetromino (the one that will be put up when the current one is cleared)
 -2dimensional array of pointers to blocks (each element in the array represents an x,y on the playing grid, null if no block there).
--Pointer to the current tetromino (the one thats falling right now)
+-Pointer to the current tetromino (the one that's falling right now)
 */
+	boolean exitGameYet; //when the user wants to exit to dos this will become true
 	int level;
 	int score;
-	boolean paused;
+	gamestate_t status; //state of the game
 	tetromino * next;
 	tetromino * current;
 	block * pos[SIZE_X][SIZE_Y];
 } gameModule;
 
+//===============================================
+//Game functions below
+//===============================================
 //returns the current score of the player (integer)
 int g_getScore();
 
@@ -65,18 +69,25 @@ void g_clear(gameOverReason_t r);
 //shut down the program
 void g_end();
 
-//loads the game part of the game, and begins game play.
+//sets inital gameModule values, loads the game part of the game, and begins game play.
 void g_create();
-
-//initial booting of the game, inits sdl and creates the screen, also sets initial values
-//for the gameModule and menu.ends with the menu displayed waiting for input
-boolean g_boot();
 
 //takes a .bmp file and draws it on the screen
 boolean draw_bmp(char * filename);
 
 void debug_msg(char * msg); //prints messages to terminal if debug mode is enabled
 
+//main game loop. point of no return
+void g_loop();
+
+//gets input and makes changes to the game entitys (whether in game or in menu) based on input
+int g_handleInput();
+
+//setup some initial values (not all, just the necessary ones at the time) for gameModule at program startup
+void g_init();
+
+//sets the entire grid array to NULL
+void g_clearGrid();
 
 
 #endif

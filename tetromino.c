@@ -61,19 +61,19 @@ boolean block_move(block * b, dir_t dir)
 	int x = block_getLocX(b);
 	int y = block_getLocY(b);
 	
-	if ( dir == dir_left )
+	if ( dir == DIR_LEFT )
 	{
 		x -= 1;
 	}
-	else if  ( dir == dir_right )
+	else if  ( dir == DIR_RIGHT )
 	{
 		x += 1;
 	}
-	else if ( dir == dir_up )
+	else if ( dir == DIR_UP )
 	{
 		y += 1;
 	}
-	else if ( dir == dir_down )
+	else if ( dir == DIR_DOWN )
 	{
 		y -= 1;
 	}
@@ -93,6 +93,32 @@ int block_getLocX(block * b)
 int block_getLocY(block * b)
 {
 	return b->y;
+}
+
+//set the x coordinate of this block, fails if coord is out of bounds
+boolean block_setLocX(block * b, int x)
+{
+	if ( x < X_MIN || x > X_MAX )
+	{
+		debug_msg("[block_setLocX]: tried to set to an x out of bounds!\n");
+		return false;
+	}
+	
+	b->x = x;
+	return true;
+}
+
+//set the y coordinate of this block, fails if coord is out of bounds
+boolean block_setLocY(block * b, int y)
+{
+	if ( y < Y_MIN || y > Y_MAX )
+	{
+		debug_msg("[block_setLocY]: tried to set to an y out of bounds!\n");
+		return false;
+	}
+	
+	b->y = y;
+	return true;
 }
 
 boolean block_isSleep(block * b)
@@ -135,7 +161,7 @@ void block_setParent(block * b, tetromino * parent)
 boolean block_setType(block * b, tetroShape_t type)
 {
 	//bad data,
-	if ( type != tetro_I && type != tetro_J && type != tetro_L && type != tetro_O && type != tetro_S && type != tetro_T && type != tetro_Z )
+	if ( type != TETRO_I && type != TETRO_J && type != TETRO_L && type != TETRO_O && type != TETRO_S && type != TETRO_T && type != TETRO_Z )
 		return false;
 	else
 	{
@@ -267,7 +293,7 @@ boolean tetro_doWake(tetromino * t)
 boolean tetro_setType(tetromino * t, tetroShape_t type)
 {
 	//bad data,
-	if ( type != tetro_I && type != tetro_J && type != tetro_L && type != tetro_O && type != tetro_S && type != tetro_T && type != tetro_Z )
+	if ( type != TETRO_I && type != TETRO_J && type != TETRO_L && type != TETRO_O && type != TETRO_S && type != TETRO_T && type != TETRO_Z )
 		return false;
 	else
 	{

@@ -10,13 +10,11 @@ typedef enum
 } highScoresReason_t;
 
 
-int m_getInput();
-
-int m_up();
-int m_down();
+boolean m_up();
+boolean m_down();
 int m_newGame();
-int m_highScores(highScoresReason_t r);
-int m_clear();
-int m_create();
+boolean m_highScores(highScoresReason_t r);
+boolean m_clear();
+boolean m_create();
 
 #endif
