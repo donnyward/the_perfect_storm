@@ -1,5 +1,5 @@
 #ifndef __MENU_H__
-#def __MENU_H__
+#define __MENU_H__
 
 #include "types.h"
 
@@ -7,7 +7,7 @@ typedef enum
 {
 	reason_idle, //player was idle (no input) for a period of time
 	reason_chosen, //player explicitly chose to view high scores
-} highScoresReason_t
+} highScoresReason_t;
 
 
 int m_getInput();

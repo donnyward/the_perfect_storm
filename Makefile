@@ -5,14 +5,15 @@ LIBS = `sdl-config --cflags --libs`
 OBJECTS =			\
 		main.o		\
 		game.o		\
-		block.o
+		tetromino.o	\
+		menu.o
 EXECUTABLE = ps
 
 #all : $(OBJECTS)
 #	$(CC) $(OBJECTS) -o $(EXECUTABLE) $(LIBS)
 	
-game : main.o game.o block.o tetromino.o
-	gcc main.o game.o block.o -o tetromino.o `sdl-config --cflags --libs` -o ps 
+game : $(OBJECTS)
+	gcc $(OBJECTS) `sdl-config --cflags --libs` -o ps 
 	
 main.o : main.c
 	gcc -c main.c
@@ -25,6 +26,9 @@ block.o : block.c
 	
 tetromino.o : tetromino.c
 	gcc -c tetromino.c
+	
+menu.o : menu.c
+	gcc -c menu.c
 	
 clean :
 	rm ps $(OBJECTS)

@@ -16,7 +16,7 @@ int m_newGame()
 {
 }
 
-int m_highScores(int highScoresReason)
+int m_highScores(highScoresReason_t r)
 {
 }
 
