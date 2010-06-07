@@ -7,6 +7,8 @@ SDL_Surface * screen;
 
 int main(int argc, char * argv[])
 {
+	SDL_Surface * splash;
+	
 	printf("Loading SDL...\n");
 	//init screen surface
 	if ( SDL_Init( SDL_INIT_EVERYTHING ) != 0 ) //init basics (event handling, filei/o and threading) + video + timer (for constant update rate)
@@ -23,9 +25,21 @@ int main(int argc, char * argv[])
 		printf("Error setting video mode to %dx%d, %d bit depth: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, BIT_DEPTH, SDL_GetError());
 		return false;
 	}
+	
+	SDL_WM_SetCaption("The Perfect Storm", "PS"); //sets the title of the window. 1st string is the window title, 2nd is taskbar title
 
-	//draw a bmp on the screen
-	draw_bmp("splash.bmp");
+	//display splash screen
+	splash = SDL_LoadBMP("splash.bmp");
+	if (splash == NULL)
+		printf("[main]: No splash image found!\n");
+	else
+	{
+		if ( SDL_BlitSurface(splash, NULL, screen, NULL) < 0 ) //< 0 == fail
+			printf("[main]: Splash failed to Blit!\n");
+			
+		SDL_Flip(screen); //updates entire screen
+		SDL_FreeSurface(splash); //clear splash from memory, its on screen now
+	}
 	
 	//set some initial values for the gameModule
 	g_init();

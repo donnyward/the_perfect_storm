@@ -14,6 +14,9 @@ typedef struct block
 	tetroShape_t type; //the type of block, corresponds to the type of tetromino it is or was a part of (or blank if it is created to fill the screen upon losing)
 } block;
 
+
+//put in a variable that keeps track of what the NEXT move is... so when you call move,
+//it will just look where to move next (which is set by g_handleInput()) and then make the move
 typedef struct tetromino
 {
 	block * children[TETRO_SIZE]; //the 4 child blocks that make of this tetromino

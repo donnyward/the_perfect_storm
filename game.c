@@ -145,24 +145,87 @@ void debug_msg(char * msg)
 
 void g_loop()
 {
+	//return; //until the loop is no longer infinite
 	while ( !game.exitGameYet )
 	{
 		//get time passed since last loop and see if enough time has passed for another update (target = 30 fps)
 		//take note of the current time (for next loop around)
 		
 		
-		//handle input
+		//handle input, this should do nothing more then set values on objects (like tetrominos) so they know what to do next
+		g_handleInput();
 		
-		//update the game (moving, scoring, etc)
+		//update the game (moving, scoring, menu seletion etc). this should look at the values set by g_handleInput() and update accordingly
+		g_updateGame();
 		
-		//update the display with latest updated data (score, new position of block, etc)
-		debug_msg("*");
-		usleep(3333); //30 fps
+		//update the display with latest updated data clear the screen and redraw everything
+		g_drawGame();
+		SDL_Delay(33); //~30 fps
 	}
 	g_end(); //exit to dos
 }
 
-int g_handleInput()
+void g_handleInput()
+{
+	SDL_Event event;
+	
+	while ( SDL_PollEvent(&event) ) //returns 1 if there are pending events, 0 if none (causes while loop to exit)
+	{
+		//an event was polled and the details are stored in the SDL_Event for this loop
+		switch (event.type)
+		{
+			//keyboard press
+			case SDL_KEYDOWN:
+				printf("A key was pushed down!\n");
+				switch (event.key.keysym.sym) //figure out what key
+				{
+					case SDLK_DOWN:
+					case SDLK_LEFT:
+					case SDLK_RIGHT:
+					//case escape (bring up pause menu, or go back thru any menu that your in.)
+					//
+					default:
+						break;
+				}
+				break;
+			//keyboard release, in this case movement would be stopped for the frame
+			case SDL_KEYUP:
+				printf("A key was pushed up!\n");
+				switch (event.key.keysym.sym) //figure out what key
+				{
+					case SDLK_DOWN:
+					case SDLK_LEFT:
+					case SDLK_RIGHT:
+
+					default:
+						break;
+				}
+				break;
+			case SDL_MOUSEBUTTONDOWN: //dont need a case for mouseUP. mouse click is only used in menus, not gameplay
+				printf("A mouse button was pushed down!\n");
+				switch (event.button.button)
+				{
+					case SDL_BUTTON_LEFT:
+						//find out what menu we are on, and if we clicked on a button,
+						//if we clicked a button then set a variable in the menu to be handled
+						break;
+				}
+			
+			case SDL_QUIT: //user clicked the x on the window
+				printf("X clicked!\n");
+				game.exitGameYet = true;
+				break;
+		}
+	}
+				
+}
+
+void g_updateGame()
+{
+
+}
+
+void g_drawGame()
 {
 
 }

@@ -81,7 +81,13 @@ void debug_msg(char * msg); //prints messages to terminal if debug mode is enabl
 void g_loop();
 
 //gets input and makes changes to the game entitys (whether in game or in menu) based on input
-int g_handleInput();
+void g_handleInput();
+
+//take new input if any and apply changes to the objects in the game based on input and other behaviors
+void g_updateGame();
+
+//update the display with any changes since last frame
+void g_drawGame();
 
 //setup some initial values (not all, just the necessary ones at the time) for gameModule at program startup
 void g_init();
