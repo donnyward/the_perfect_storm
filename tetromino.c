@@ -61,21 +61,46 @@ boolean block_move(block * b, dir_t dir)
 	int x = block_getLocX(b);
 	int y = block_getLocY(b);
 	
-	if ( dir == DIR_LEFT )
+	if ( dir == DIR_WEST )
 	{
 		x -= 1;
 	}
-	else if  ( dir == DIR_RIGHT )
+	else if  ( dir == DIR_EAST )
 	{
 		x += 1;
 	}
-	else if ( dir == DIR_UP )
+	else if ( dir == DIR_NORTH )
 	{
 		y += 1;
 	}
-	else if ( dir == DIR_DOWN )
+	else if ( dir == DIR_SOUTH )
 	{
 		y -= 1;
+	}
+	else if ( dir == DIR_NORTHWEST )
+	{
+		x -= 1;
+		y += 1;
+	}
+	else if ( dir == DIR_SOUTHWEST )
+	{
+		x -= 1;
+		y -= 1;
+	}
+	else if ( dir == DIR_NORTHEAST )
+	{
+		x += 1;
+		y += 1;
+	}
+	else if ( dir == DIR_SOUTHEAST )
+	{
+		x += 1;
+		y -= 1;
+	}
+	else if ( dir == DIR_NONE )
+	{
+		//do nothing
+		return true;
 	}
 	else //bad dir
 	{
@@ -196,6 +221,10 @@ tetromino * tetro_create(tetroShape_t type)
 		t->children[i] = b;
 	}
 	
+	t->nextMoveX = DIR_NONE;
+	t->nextMoveY = DIR_NONE;
+	t->nextMoveDir = DIR_NONE;
+	
 	return t;
 }
 
@@ -221,11 +250,15 @@ boolean tetro_clear(tetromino * t)
 	return true;
 }
 
+//incomplete definition
 boolean tetro_move(tetromino * t, dir_t dir)
 {
 	int i;
 	int x, y;
 	block * b;
+	
+	if ( dir == DIR_NONE )
+		return true;
 	
 	//make it so either all of the blocks will move in the direction, or none of them will
 	for ( i = 0; i < TETRO_SIZE; i++ )
@@ -236,6 +269,9 @@ boolean tetro_move(tetromino * t, dir_t dir)
 		//x = block_getLocX(b);
 		//y = block_getLocY(b);
 	}
+	
+	
+	return true;
 }
 
 boolean tetro_moveStart(tetromino * t)

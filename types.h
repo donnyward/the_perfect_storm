@@ -1,7 +1,7 @@
 #ifndef __TYPES_H__
 #define __TYPES_H__
 
-#define DEBUG_MODE 1 //enables debug messages printed to terminal
+#define DEBUG_MODE 0 //enables debug messages printed to terminal
 
 //===============================================
 //Game dimensions/constants
@@ -51,17 +51,23 @@ typedef enum
 //directions
 typedef enum
 {
-	DIR_LEFT,
-	DIR_RIGHT,
-	DIR_UP,
-	DIR_DOWN,
+	DIR_NORTH,
+	DIR_NORTHEAST,
+	DIR_EAST,
+	DIR_SOUTHEAST,
+	DIR_SOUTH,
+	DIR_SOUTHWEST,
+	DIR_WEST,
+	DIR_NORTHWEST,
+	DIR_NONE,
 } dir_t;
+
 
 //state of the game, playing, paused, menus...
 typedef enum
 {
 	STATE_PLAYING,
-	STATE_PAUSED,
+	STATE_PAUSED, //same as menu
 	STATE_MENU,
 } gamestate_t;
 

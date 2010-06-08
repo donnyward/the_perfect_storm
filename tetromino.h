@@ -12,6 +12,7 @@ typedef struct block
 	struct tetromino * parent; //pointer to the parent tetromino object
 	boolean sleep; //a sleeping block doesnt move or do much of anything
 	tetroShape_t type; //the type of block, corresponds to the type of tetromino it is or was a part of (or blank if it is created to fill the screen upon losing)
+	dir_t moveDir; //direction to move next move
 } block;
 
 
@@ -22,6 +23,10 @@ typedef struct tetromino
 	block * children[TETRO_SIZE]; //the 4 child blocks that make of this tetromino
 	tetroShape_t type;
 	boolean sleep;
+	dir_t nextMoveX;
+	dir_t nextMoveY;
+	dir_t nextMoveDir;
+	
 } tetromino;
 
 //===============================================

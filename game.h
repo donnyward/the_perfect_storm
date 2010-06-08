@@ -26,7 +26,7 @@ typedef struct gameModule
 	boolean exitGameYet; //when the user wants to exit to dos this will become true
 	int level;
 	int score;
-	gamestate_t status; //state of the game
+	gamestate_t state; //state of the game
 	tetromino * next;
 	tetromino * current;
 	block * pos[SIZE_X][SIZE_Y];
@@ -94,6 +94,10 @@ void g_init();
 
 //sets the entire grid array to NULL
 void g_clearGrid();
+
+//call this when movement down is blocked. sets the tetromino into place, checks for full lines
+//and acts accordingly. then calls next tetromino into play, and creates the next one that waits in stasis
+void g_onDownBlocked();
 
 
 #endif

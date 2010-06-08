@@ -1,14 +1,50 @@
 #include "game.h"
 #include "types.h"
 
-
 #include "SDL/SDL.h" //needed for all SDL apps
 #include <stdio.h> //for prinf
 #include <stdlib.h> //for exit()
 
-extern SDL_Surface * screen; //the screen surface. originally declared in main.c
+#include "menu.h"
 
+extern SDL_Surface * screen; //the screen surface. originally declared in main.c
+extern menu_t menu;
 gameModule game; //game module, stores levle, 2d grid and what it contains, etc
+
+/*
+dir_t oppositeDir[] = 
+{
+	DIR_RIGHT, DIR_LEFT, DIR_DOWN,
+	DIR_UP, DIR_NONE
+};
+*/
+dir_t clockwiseDir[] = 
+{
+	DIR_NORTHEAST,
+	DIR_EAST,
+	DIR_SOUTHEAST,
+	DIR_SOUTH,
+	DIR_SOUTHWEST,
+	DIR_WEST,
+	DIR_NORTHWEST,
+	DIR_NORTH,
+	DIR_NONE,
+};
+
+dir_t counterClockwiseDir[] = 
+{
+	DIR_NORTHWEST,
+	DIR_NORTH,
+	DIR_NORTHEAST,
+	DIR_EAST,
+	DIR_SOUTHEAST,
+	DIR_SOUTH,
+	DIR_SOUTHWEST,
+	DIR_WEST,
+	DIR_NONE,
+};
+
+int frame = 0;
 
 int g_getScore()
 {
@@ -101,7 +137,7 @@ void g_create()
 	game.exitGameYet = false;
 	game.level = 1;
 	game.score = 0;
-	game.status = STATE_PLAYING; //state of the game
+	game.state = STATE_PLAYING; //state of the game
 	game.next = NULL;
 	game.current = NULL;
 
@@ -137,6 +173,12 @@ boolean draw_bmp(char * filename)
 	return true;
 }
 
+boolean g_addSurface()
+{
+
+	return true;
+}
+
 void debug_msg(char * msg)
 {
 	if (DEBUG_MODE)
@@ -160,7 +202,7 @@ void g_loop()
 		
 		//update the display with latest updated data clear the screen and redraw everything
 		g_drawGame();
-		SDL_Delay(33); //~30 fps
+
 	}
 	g_end(); //exit to dos
 }
@@ -169,28 +211,112 @@ void g_handleInput()
 {
 	SDL_Event event;
 	
-	while ( SDL_PollEvent(&event) ) //returns 1 if there are pending events, 0 if none (causes while loop to exit)
+	while ( SDL_PollEvent(&event) ) //returns 1 if there are pending events
 	{
 		//an event was polled and the details are stored in the SDL_Event for this loop
 		switch (event.type)
 		{
-			//keyboard press
 			case SDL_KEYDOWN:
-				printf("A key was pushed down!\n");
-				switch (event.key.keysym.sym) //figure out what key
+				printf("[g_handleInput()]: A key was pushed down!\n");
+				if (game.state = STATE_MENU)
 				{
-					case SDLK_DOWN:
-					case SDLK_LEFT:
-					case SDLK_RIGHT:
-					//case escape (bring up pause menu, or go back thru any menu that your in.)
-					//
-					default:
-						break;
+					switch (event.key.keysym.sym) //figure out what key
+					{
+						case SDLK_DOWN:
+							if (menu.nextMoveY == DIR_NONE)
+								menu.nextMoveY = DIR_SOUTH;
+							else if (menu.nextMoveY == DIR_NORTH)
+							{
+								//cancel out opposite inputs
+								menu.nextMoveY == DIR_NONE;
+							}
+							break;
+						case SDLK_UP:
+							if (menu.nextMoveY == DIR_NONE)
+								menu.nextMoveY = DIR_NORTH;
+							else if (menu.nextMoveY == DIR_SOUTH)
+							{
+								//cancel out opposite inputs
+								menu.nextMoveY == DIR_NONE;
+							}
+							break;
+						//case enter:
+						/*
+							if (menu.forwardOrBack == DIR_NONE)
+								menu.forwardOrBack = DIR_NORTH;
+							else if (menu.forwardOrBack == DIR_SOUTH) //scheduled to go back
+								menu.forwardOrBack = DIR_NONE;
+						case ESCAPE!:
+							if (menu.forwardOrBack == DIR_NONE)
+								menu.forwardOrBack = DIR_SOUTH;
+							else if (menu.forwardOrBack == DIR_NORTH) //scheduled to go forward
+								menu.forwardOrBack = DIR_NONE;
+						/*
+						case SDLK_LEFT:
+							if (menu.nextMoveX == DIR_NONE)
+								menu.nextMoveX = DIR_WEST;
+							else if (menu.nextMoveX == DIR_EAST)
+							{
+								//cancel out opposite inputs
+								menu.nextMoveY == DIR_NONE;
+							}
+							break;
+						case SDLK_RIGHT:
+							if (menu.nextMoveX == DIR_NONE)
+								menu.nextMoveX = DIR_EAST;
+							else if (menu.nextMoveX == DIR_WEST)
+							{
+								//cancel out opposite inputs
+								menu.nextMoveY == DIR_NONE;
+							}
+							break;
+						*/
+						//case escape (bring up pause menu, or go back thru any menu that your in.)
+						//
+						default:
+							break;
+					}
+				}
+				else if (game.state = STATE_PLAYING)
+				{
+					switch (event.key.keysym.sym) //figure out what key
+					{
+						case SDLK_DOWN:
+							if (game.current->nextMoveY == DIR_NONE)
+								game.current->nextMoveY = DIR_SOUTH;
+							else if (game.current->nextMoveY == DIR_NORTH)
+							{
+								//cancel out opposite inputs
+								game.current->nextMoveY == DIR_NONE;
+							}
+							break;
+						case SDLK_LEFT:
+							if (game.current->nextMoveX == DIR_NONE)
+								game.current->nextMoveX = DIR_WEST;
+							else if (game.current->nextMoveX == DIR_EAST)
+							{
+								//cancel out opposite inputs
+								game.current->nextMoveY == DIR_NONE;
+							}
+							break;
+						case SDLK_RIGHT:
+							if (game.current->nextMoveX == DIR_NONE)
+								game.current->nextMoveX = DIR_EAST;
+							else if (game.current->nextMoveX == DIR_WEST)
+							{
+								//cancel out opposite inputs
+								game.current->nextMoveY == DIR_NONE;
+							}
+							break;
+						//case escape (bring up pause menu, or go back thru any menu that your in.)
+						//case spacebar (rotate tertromino in this case)
+						default:
+							break;
+					}
 				}
 				break;
-			//keyboard release, in this case movement would be stopped for the frame
 			case SDL_KEYUP:
-				printf("A key was pushed up!\n");
+				printf("[g_handleInput()]: A key was pushed up!\n");
 				switch (event.key.keysym.sym) //figure out what key
 				{
 					case SDLK_DOWN:
@@ -202,7 +328,7 @@ void g_handleInput()
 				}
 				break;
 			case SDL_MOUSEBUTTONDOWN: //dont need a case for mouseUP. mouse click is only used in menus, not gameplay
-				printf("A mouse button was pushed down!\n");
+				printf("[g_handleInput()]: A mouse button was pushed down!\n");
 				switch (event.button.button)
 				{
 					case SDL_BUTTON_LEFT:
@@ -210,19 +336,83 @@ void g_handleInput()
 						//if we clicked a button then set a variable in the menu to be handled
 						break;
 				}
-			
+				break;
 			case SDL_QUIT: //user clicked the x on the window
-				printf("X clicked!\n");
+				printf("[g_handleInput()]: X clicked!\n");
 				game.exitGameYet = true;
 				break;
 		}
-	}
-				
+	}			
 }
 
 void g_updateGame()
 {
+	if (game.state == STATE_MENU)
+	{
+		if (DEBUG_MODE)
+		{
+			frame++;
+			if (frame == 61)
+				frame = 1;
+			printf("[g_updateGame]: FRAME = %d\n", frame);
+		}
+		
+		if ( !m_move() )
+			printf("[g_updateGame]: m_move failed!\n");
+	}
+	else if (game.state == STATE_PLAYING)
+	{	
+		//take note of the time here, see if it is time to move the current tetro
+		//1 notch down
+		/*
+		if ( !tetro_move(game.current, DIR_SOUTH) ) //the periodic drop down was blocked
+		{
+			printf("[g_updateGame]: periodic drop down blocked!\n");
+			g_onDownBlocked();
+		}
+			
+		*/
+			
+		//create resultant move direction
+		if ( game.current->nextMoveX == DIR_NONE )
+			game.current->nextMoveDir = game.current->nextMoveY;
+		else if ( game.current->nextMoveY == DIR_NONE )
+			game.current->nextMoveDir = game.current->nextMoveX;
+		else if ( game.current->nextMoveY == DIR_NORTH )
+		{
+			if ( game.current->nextMoveX == DIR_WEST )
+				game.current->nextMoveDir = DIR_NORTHWEST;
+			else
+				game.current->nextMoveDir = DIR_NORTHEAST;
+		}
+		else //nextMoveY == south
+		{
+			if ( game.current->nextMoveX == DIR_WEST )
+				game.current->nextMoveDir = DIR_SOUTHWEST;
+			else
+				game.current->nextMoveDir = DIR_SOUTHEAST;
+		}
+			
+		//attempt to move tetro in this direction
+		if ( !tetro_move(game.current, game.current->nextMoveDir) )
+		{
+			printf("[g_updateGame]: tetro_move failed!\n");
+			if ( game.current->nextMoveDir == DIR_SOUTH )
+			{
+				//check for full lines, and call next tetromino into play
+			}
+		}
+			
+		//clear tetromino move values for next frame
+		game.current->nextMoveX = DIR_NONE;
+		game.current->nextMoveY = DIR_NONE;
+		game.current->nextMoveDir = DIR_NONE;
 
+	}
+	else
+	{
+		printf("[g_updateGame]: unknown game.state!\n");
+	}
 }
 
 void g_drawGame()
@@ -233,7 +423,7 @@ void g_drawGame()
 void g_init()
 {
 	game.exitGameYet = false;
-	game.status = STATE_MENU; //state of the game
+	game.state = STATE_MENU;
 }
 
 void g_clearGrid()
@@ -244,4 +434,9 @@ void g_clearGrid()
 	for ( i = 0; i < SIZE_X; i++ )
 		for ( j = 0; j < SIZE_Y; j++ )
 			game.pos[i][j] = NULL;
+}
+
+void g_onDownBlocked()
+{
+
 }
