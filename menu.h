@@ -2,6 +2,7 @@
 #define __MENU_H__
 
 #include "types.h"
+#include "game.h"
 
 typedef enum
 {
@@ -40,10 +41,13 @@ typedef enum
 
 typedef struct
 {
-	dir_t nextMoveX; //next move to make in the x direction
-	dir_t nextMoveY; //next move to make in the y direction
-	dir_t nextMoveDir; //next move to make in x and y (includes diagonals)
-	dir_t forwardOrBack; //go forward thru the menu (NORTH/enter) backward (SOUTH/escape) or neither (DIR_NONE)
+	//next move to make through menu.
+	//DIR_NORTH = up 1
+	//DIR_SOUTH = down 1
+	//DIR_EAST = make selection (enter)
+	//DIR_WEST = go back (escape)
+	dir_t nextMoveDir;
+
 	menuLoc_t menuLoc; //which menu panel we are currently on
 	menuSelection_t currentSelection;
 } menu_t;
@@ -53,22 +57,10 @@ typedef struct
 //can also specify a specific menu option to highlight/select, (for use with mouse pointer highlighting)
 boolean m_move();
 
-//called when enter is pushed and new game is selected. Sets up a new game.
-int m_newGame();
-
-//stops updating the game and brings up the pause menu.
-boolean m_pause();
-
 //called when no input is entered for a long time, or entered in the menu.
 //displays high scores until input is received (if called with enter),
 //or only for a period of time if it was called due to inactivity.
 boolean m_highScores(highScoresReason_t r);
-
-//erases the menu, or stop all menu related functions from working now since game is playing now
-boolean m_clear();
-
-//creates the menu as it should look for the frame, based on input and variables and whatnot
-boolean m_create();
 
 //set up menu initial menu values for the very 1st run thru
 void m_init();

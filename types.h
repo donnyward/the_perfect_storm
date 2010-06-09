@@ -71,6 +71,12 @@ typedef enum
 	STATE_MENU,
 } gamestate_t;
 
+typedef enum
+{
+	REASON_QUIT, //player quit
+	REASON_LOSS, //player lost
+} gameOverReason_t;
+
 //the start position for each child block of the different shaped tetrominos
 //blocks 1-4 go from left to right, top to bottom (like reading)
 typedef struct

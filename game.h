@@ -6,11 +6,7 @@
 //#include "block.h"
 
 
-typedef enum
-{
-	reason_quit, //player quit
-	reason_loss, //player lost
-} gameOverReason_t;
+
 
 
 typedef struct gameModule
@@ -53,15 +49,6 @@ boolean g_setBlockToPos(block * b, int x, int y);
 //takes a pointer to a block and removes it from wherever it was. false if it was nowhere (i.e. just created)
 boolean g_removeBlockFromPos(block * b);
 
-//gets the current score, level, position of all blocks and draws them to the screen.
-void g_draw();
-
-//awaits player input, and either rotates the tetromino or moves the tetromino (else do nothing)
-void g_doInput();
-
-//pauses game, suspends everything, pops up menu with "resume" or "quit"
-void g_pause();
-
 //ends current game. an argument will be passed to tell the game if the game ended
 //because the player quit or because the player lost (or the player won)..
 void g_clear(gameOverReason_t r);
@@ -69,6 +56,7 @@ void g_clear(gameOverReason_t r);
 //shut down the program
 void g_end();
 
+//call this when starting a new game
 //sets inital gameModule values, loads the game part of the game, and begins game play.
 void g_create();
 
@@ -86,16 +74,18 @@ void g_handleInput();
 //take new input if any and apply changes to the objects in the game based on input and other behaviors
 void g_updateGame();
 
-//update the display with any changes since last frame
+//gets the current score, level, position of all blocks and draws them to the screen.
 void g_drawGame();
 
 //setup some initial values (not all, just the necessary ones at the time) for gameModule at program startup
+//also initializes the 2d array to null
 void g_init();
 
-//sets the entire grid array to NULL
+//clears the grid. all blocks are freed from memory, if they are linked to a tetromino, that is cleared first
+//result is entire grid is NULL
 void g_clearGrid();
 
-//call this when movement down is blocked. sets the tetromino into place, checks for full lines
+//call this when movement down is blocked. sets the tetromino into place (and tetro_clear's it), checks for full lines
 //and acts accordingly. then calls next tetromino into play, and creates the next one that waits in stasis
 void g_onDownBlocked();
 

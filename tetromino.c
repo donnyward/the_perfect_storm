@@ -2,6 +2,7 @@
 #include "tetromino.h"
 #include "types.h"
 #include "stdlib.h" //for malloc and NULL
+#include <stdio.h>
 
 //===============================================
 //Block functions below
@@ -237,16 +238,16 @@ boolean tetro_clear(tetromino * t)
 	{
 		b = t->children[i];
 		if ( !block_doSleep(b) ) //put child to sleep
+		{
+			printf("[tetro_clear]: one of the children was already asleep! weird\n");
 			return false;
+		}
 			
 		block_setParent(b, NULL); //unlink from parent	
 	}
 	
 	free(t); //remove tetromino from memory
-	
-	//check to see if any lines have been made, if so then clear them and give points
-	
-	//call next tetromino to the start position and begin its descent
+
 	return true;
 }
 

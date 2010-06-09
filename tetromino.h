@@ -87,8 +87,6 @@ tetroShape_t block_getType(block * b);
 tetromino * tetro_create(tetroShape_t type);
 
 //puts child blocks to sleep, unlinks children from parent, frees tetromino from memory,
-//checks to see if any lines were completed, then moves the next tetromino to the start
-//and begins it's descent
 boolean tetro_clear(tetromino * t);
 
 //move this tetromino one notch in direction dir, fails if any child block is blocked.
