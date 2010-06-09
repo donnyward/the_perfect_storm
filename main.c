@@ -29,7 +29,7 @@ int main(int argc, char * argv[])
 	SDL_WM_SetCaption("The Perfect Storm", "PS"); //sets the title of the window. 1st string is the window title, 2nd is taskbar title
 
 	//display splash screen
-	splash = SDL_LoadBMP("splash.bmp");
+	splash = SDL_LoadBMP("./pictures/splash.bmp");
 	if (splash == NULL)
 		printf("[main]: No splash image found!\n");
 	else

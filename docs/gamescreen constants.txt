@@ -1,0 +1,33 @@
+blocks are 25x25
+
+coords x goes left to right increasing
+coords y increases from top to bottom
+
+hole width = 250
+hole height = 450
+
+hole x dimensions = pixels 195-445 (250 wide)
+hole y dimensions = pixels 0-450 (450 high)
+
+bottom left = (196,1)
+top right = (445,450)
+
+top left = (195, 30)
+bottom right = (445, 480)
+
+score box:
+rounding down to the previous whole pixel
+top left = (11, 94)
+bottom right = (153, 141)
+
+level:
+top left = (11, 236)
+bottom right = (153, 283)
+
+lines:
+top left = (11, 377)
+bottom right = (153, 424)
+
+next:
+top left = (495, 188)
+bottom right = (613, 235)
