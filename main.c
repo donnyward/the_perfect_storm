@@ -29,16 +29,17 @@ int main(int argc, char * argv[])
 	SDL_WM_SetCaption("The Perfect Storm", "PS"); //sets the title of the window. 1st string is the window title, 2nd is taskbar title
 
 	//display splash screen
-	splash = SDL_LoadBMP("./pictures/splash.bmp");
+	splash = g_loadImage("./pictures/splash.bmp");//SDL_LoadBMP("./pictures/splash.bmp");
+	
 	if (splash == NULL)
 		printf("[main]: No splash image found!\n");
 	else
 	{
-		if ( SDL_BlitSurface(splash, NULL, screen, NULL) < 0 ) //< 0 == fail
+		if ( !g_addSurface(0, 0, splash, screen) )
 			printf("[main]: Splash failed to Blit!\n");
 			
 		SDL_Flip(screen); //updates entire screen
-		SDL_FreeSurface(splash); //clear splash from memory, its on screen now
+		//SDL_FreeSurface(splash); //clear splash from memory, its on screen now
 	}
 	
 	//set some initial values for the gameModule

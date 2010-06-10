@@ -44,6 +44,37 @@ dir_t counterClockwiseDir[] =
 	DIR_WEST,
 	DIR_NONE,
 };
+/*
+typedef enum
+{
+	//M_MAIN menu choices
+	S_NEWGAME,
+	S_HIGHSCORES,
+	S_EXIT, //exit entire program
+	
+	//M_HIGHSCORES menu choices
+	//none applicable
+	
+	//M_PAUSE menu choices
+	S_CONTINUE,
+	S_QUIT,
+	
+	//M_PAUSECONFIRMQUIT and M_EXIT menu choices
+	S_YES,
+	S_NO,
+} menuSelection_t;
+*/
+
+//pixel locations of the top left corner of each button image
+int buttonLocX[] = 
+{
+	
+};
+
+int buttonLocY[] = 
+{
+	
+};
 
 int frame = 0;
 
@@ -126,6 +157,7 @@ void g_create()
 	//set initial values for a gameModule new game
 	game.level = 1;
 	game.score = 0;
+	game.lines = 0;
 	game.state = STATE_PLAYING; //state of the game
 	game.next = NULL;
 	game.current = NULL;
@@ -162,10 +194,40 @@ boolean draw_bmp(char * filename)
 	return true;
 }
 
-boolean g_addSurface()
+SDL_Surface * g_loadImage(char * filename)
 {
+	SDL_Surface * loaded = NULL;
+	SDL_Surface * image = NULL;
+	
+	loaded = SDL_LoadBMP(filename);
+	if ( loaded != NULL )
+	{
+		image = SDL_DisplayFormat(loaded); //converts loaded bmp into screen settings (if not already set to them)
+		SDL_FreeSurface(loaded);
+	}
+	else
+		return NULL;
+		
+	return image;
+}
 
-	return true;
+boolean g_addSurface(int x, int y, SDL_Surface * source, SDL_Surface * dest)
+{
+	SDL_Rect offset;
+	
+	offset.x = x;
+	offset.y = y;
+	
+	if ( SDL_BlitSurface(source, NULL, dest, &offset) < 0 ) //<0 = fail
+	{
+		SDL_FreeSurface(source);
+		return false;
+	}
+	else
+	{
+		SDL_FreeSurface(source);
+		return true;
+	}
 }
 
 void debug_msg(char * msg)
@@ -333,11 +395,11 @@ void g_updateGame()
 			printf("[g_updateGame]: FRAME = %d\n", frame);
 		}
 		
-		//too much output below
-		/*
 		if ( !m_move() )
-			printf("[g_updateGame]: m_move returned false!\n");
-		*/
+		{
+			//too much output
+			//printf("[g_updateGame]: m_move returned false!\n");
+		}
 		//clean up menu options for next frame
 		menu.nextMoveDir = DIR_NONE;
 	}
@@ -396,23 +458,106 @@ void g_updateGame()
 	}
 }
 
+void g_getImageCoords(short i, short j, short * x, short * y)
+{
+	*x = PLAYING_FIELD_X_MIN + (BLOCK_WIDTH * i);
+	*y = PLAYING_FIELD_Y_MAX - BLOCK_HEIGHT - (BLOCK_HEIGHT * j);
+}
+
 void g_drawGame()
 {
-	SDL_Surface * image;
+	SDL_Surface * image = NULL;
+	short i, j, x, y;
+	block * b = NULL;
 	
 	if (game.state == STATE_MENU)
 	{
 		//draw the background followed by the buttons.
 		//the 'selected' button will have its highlighted version drawn
-	
+		image = g_loadImage("./pictures/menubackground.bmp");
+		
+		if (image == NULL)
+			printf("[g_drawGame]: error loading an image!\n");
+			
+		g_addSurface(0, 0, image, screen);
+
+		switch (menu.menuLoc)
+		{
+			case M_MAIN:
+				break;
+			case M_HIGHSCORES:
+				break;
+			case M_PAUSE:
+				break;
+			case M_PAUSECONFIRMQUIT:
+				break;
+			case M_EXIT:
+				break;
+			default:
+				printf("[g_drawGame]: weird menu.menuLoc!\n");
+				break;
+		}
 	}
 	else if (game.state == STATE_PLAYING)
 	{
 		//draw the background,
 		//then score, level, next block in stasis, and loop thru the 2d pos array
 		//to draw all of the blocks
-	
+		image = g_loadImage("./pictures/gamescreen.bmp");
+		
+		if (image == NULL)
+			printf("[g_drawGame]: error loading an image!\n");
+			
+		g_addSurface(0, 0, image, screen);
+		
+		
+		//score, level, lines here
+		
+		//next block here
+		
+		//draw every block in play
+		for ( i = 0; i < SIZE_X; i++ )
+		{
+			for (j = 0; j < SIZE_Y; j++ )
+			{
+				b = g_getBlockAtPos(i, j);
+				
+				if (b != NULL)
+				{
+					switch (block_getType(b))
+					{
+						case TETRO_I:
+							image = g_loadImage("./pictures/BLOCK_I.bmp");
+							break;
+						case TETRO_J:
+							image = g_loadImage("./pictures/BLOCK_J.bmp");
+							break;
+						case TETRO_L:
+							image = g_loadImage("./pictures/BLOCK_L.bmp");
+							break;
+						case TETRO_O:
+							image = g_loadImage("./pictures/BLOCK_O.bmp");
+							break;
+						case TETRO_S:
+							image = g_loadImage("./pictures/BLOCK_S.bmp");
+							break;
+						case TETRO_T:
+							image = g_loadImage("./pictures/BLOCK_T.bmp");
+							break;
+						case TETRO_Z:
+							image = g_loadImage("./pictures/BLOCK_Z.bmp");
+							break;
+					}
+					
+					g_getImageCoords(i, j, &x, &y);
+					g_addSurface(x, y, image, screen);
+				}					
+			}
+			
+		}
 	}
+	
+	SDL_Flip(screen);
 }
 
 void g_init()

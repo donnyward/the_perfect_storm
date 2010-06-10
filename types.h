@@ -21,14 +21,24 @@
 #define TETRO_SIZE 4 //how many blocks make up a tetromino
 #define TETRO_SHAPES 7 //number of different shapes
 
+#define BLOCK_WIDTH 25
+#define BLOCK_HEIGHT 25
+
+#define PLAYING_FIELD_X_MIN 195
+#define PLAYING_FIELD_Y_MIN 30
+#define PLAYING_FIELD_X_MAX 445
+#define PLAYING_FIELD_Y_MAX 480
 //===============================================
 //Video settings
 //===============================================
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
-#define BIT_DEPTH 8
+#define BIT_DEPTH 32
 
-
+//===============================================
+//Image placement offsets (from top-left of screen)
+//===============================================
+//#define 
 //boolean type, accepts true or false
 typedef enum
 {

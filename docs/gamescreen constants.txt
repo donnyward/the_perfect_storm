@@ -9,11 +9,13 @@ hole height = 450
 hole x dimensions = pixels 195-445 (250 wide)
 hole y dimensions = pixels 0-450 (450 high)
 
-bottom left = (196,1)
-top right = (445,450)
+
+//screen dimensions are y increasing top to bottom, x increase left to right
+bottom left = (195,0)
+top right = (445,30)
 
 top left = (195, 30)
-bottom right = (445, 480)
+bottom right = (445, 0)
 
 score box:
 rounding down to the previous whole pixel

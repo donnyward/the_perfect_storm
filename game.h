@@ -4,7 +4,7 @@
 #include "types.h"
 #include "tetromino.h"
 //#include "block.h"
-
+#include "SDL/SDL.h"
 
 
 
@@ -22,6 +22,7 @@ typedef struct gameModule
 	boolean exitGameYet; //when the user wants to exit to dos this will become true
 	int level;
 	int score;
+	int lines;
 	gamestate_t state; //state of the game
 	tetromino * next;
 	tetromino * current;
@@ -63,6 +64,14 @@ void g_create();
 //takes a .bmp file and draws it on the screen
 boolean draw_bmp(char * filename);
 
+//loads an image, gets it optimized and ready for blitting
+SDL_Surface * g_loadImage(char * filename);
+
+//takes a surface (containing a loaded image) and applys it to the main screen surface
+//with or without an offset
+//the screen must be flipped once all the adding is done
+boolean g_addSurface(int x, int y, SDL_Surface * source, SDL_Surface * dest);
+
 void debug_msg(char * msg); //prints messages to terminal if debug mode is enabled
 
 //main game loop. point of no return
@@ -73,6 +82,9 @@ void g_handleInput();
 
 //take new input if any and apply changes to the objects in the game based on input and other behaviors
 void g_updateGame();
+
+//returns the pixel coordinates of i and j thru x and y.
+void g_getImageCoords(short i, short j, short * x, short * y);
 
 //gets the current score, level, position of all blocks and draws them to the screen.
 void g_drawGame();
