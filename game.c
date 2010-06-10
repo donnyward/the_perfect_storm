@@ -12,13 +12,6 @@ SDL_Surface * image; //used by g_drawGame()
 extern menu_t menu; //needed in this file to set its values in g_handleInput()
 gameModule game; //game module, stores levle, 2d grid and what it contains, etc
 
-/*
-dir_t oppositeDir[] = 
-{
-	DIR_RIGHT, DIR_LEFT, DIR_DOWN,
-	DIR_UP, DIR_NONE
-};
-*/
 dir_t clockwiseDir[] = 
 {
 	DIR_NORTHEAST,
@@ -44,26 +37,6 @@ dir_t counterClockwiseDir[] =
 	DIR_WEST,
 	DIR_NONE,
 };
-/*
-typedef enum
-{
-	//M_MAIN menu choices
-	S_NEWGAME,
-	S_HIGHSCORES,
-	S_EXIT, //exit entire program
-	
-	//M_HIGHSCORES menu choices
-	//none applicable
-	
-	//M_PAUSE menu choices
-	S_CONTINUE,
-	S_QUIT,
-	
-	//M_PAUSECONFIRMQUIT and M_EXIT menu choices
-	S_YES,
-	S_NO,
-} menuSelection_t;
-*/
 
 //pixel locations of the top left corner of each button image
 int buttonLocX[] = 
@@ -74,6 +47,44 @@ int buttonLocX[] =
 int buttonLocY[] = 
 {
 	180, 280, 380, 210, 310, 210, 310
+};
+
+//coords for tetrominos in stasis (in pixel coords)
+short stasisPixelCoordX[] = 
+{
+//	467, 492, 517, 542
+	505, 530, 555, 580
+};
+
+short stasisPixelCoordY[] = 
+{
+//	234, 259
+	213, 238
+};
+
+//these coords are the 4x2 grid that the the "next" box contains
+startCoord_t stasisCoord[] = 
+{
+	//I SHAPE
+	{ {0, 1, 2, 3}, {0, 0, 0, 0} },
+	
+	//J SHAPE
+	{ {0, 1, 2, 2}, {0, 0, 0, 1} },
+	
+	//L SHAPE
+	{ {0, 1, 2, 0}, {0, 0, 0, 1} },
+	
+	//O SHAPE
+	{ {1, 2, 1, 2}, {0, 0, 1, 1} },
+	
+	//S SHAPE
+	{ {1, 2, 0, 1}, {0, 0, 1, 1} },
+		
+	//T SHAPE
+	{ {0, 1, 2, 1}, {0, 0, 0, 1} },
+
+	//Z SHAPE
+	{ {0, 1, 1, 2}, {0, 0, 1, 1} }
 };
 
 int frame = 0;
@@ -90,7 +101,7 @@ int g_getLevel()
 
 block * g_getBlockAtPos(int x, int y)
 {
-	debug_msg("[g_getBlockAtPos]: starting...\n");
+	//debug_msg("[g_getBlockAtPos]: starting...\n");
 	return game.pos[x][y];
 }
 
@@ -99,7 +110,7 @@ boolean g_setBlockToPos(block * b, int x, int y)
 	int x_old = block_getLocX(b);
 	int y_old = block_getLocY(b);
 	block * b2 = g_getBlockAtPos(x, y);
-	
+
 	if ( b2 != NULL ) //another block is already here at destination
 	{
 		return false;
@@ -112,14 +123,54 @@ boolean g_setBlockToPos(block * b, int x, int y)
 	{
 		if ( !g_removeBlockFromPos(b) ) //its original position was invalid
 			debug_msg("Block tried to remove from pos: Failed!\n");
-			
+
 		game.pos[x][y] = b;
 		block_setLocX(b, x);
 		block_setLocY(b, y);
 		return true;
 	}
 }
+/*
+boolean g_setBlockToPos(block * b, int x, int y)
+{
+	int x_old = block_getLocX(b);
+	int y_old = block_getLocY(b);
+	block * b2 = g_getBlockAtPos(x, y);
+	
+	if ( x < X_MIN || x > X_MAX || y < Y_MIN || y > Y_MAX ) //destination is out of bounds
+	{
+		printf("[g_setBlockToPos]: (%d, %d) is out of bounds!\n");
+		return false;
+	}
+	else if ( b2 != NULL ) //another block is already here at destination
+	{
+		//return false;
+		printf("[g_setBlockToPos]: warning, a block already at (%d, %d)\n", x, y);
+		
+		if ( block_getParent(b2) == block_getParent(b) )
+		{
+			printf("[g_setBlockToPos]: the two blocks are of the same parent so it is fine\n");
+			
+			//return true;
+		}
+		else
+		{
+			printf("[g_setBlockToPos]: the two blocks are of different parent, can not move\n");
+			return false;
+		}
+		
+	}
+	
 
+	//if ( !g_removeBlockFromPos(b) ) //its original position was invalid
+	//	debug_msg("[g_setBlockToPos]: Block tried to remove from pos: Failed!\n");
+			
+	game.pos[x][y] = b;
+	block_setLocX(b, x);
+	block_setLocY(b, y);
+	return true;
+}
+*/
 boolean g_removeBlockFromPos(block * b)
 {
 	int x = block_getLocX(b);
@@ -133,7 +184,7 @@ boolean g_removeBlockFromPos(block * b)
 	
 	game.pos[x][y] = NULL;
 	return true;
-}	
+}
 
 void g_clear(gameOverReason_t r)
 {
@@ -166,42 +217,13 @@ void g_create()
 
 	printf("Get Ready...\n");
 	
-	game.current = tetro_create(0);
+	game.current = tetro_create(6);
 	game.next = tetro_create(1);
-	SDL_Delay(2000); //2 seconds
+//	SDL_Delay(2000); //2 seconds
 	
 	printf("GO GO GO\n");
 	tetro_moveStart(game.current);
 	game.state = STATE_PLAYING;
-}
-
-boolean draw_bmp(char * filename)
-{
-	SDL_Surface * image;
-
-	image = SDL_LoadBMP(filename);
-	if (image == NULL) //fail
-	{
-		printf("Error loading image \"%s\"\n", filename);
-		return false;
-	}
-
-	//if the image has a palette then use that to make colors better
-	if (image->format->palette && screen->format->palette)
-	{
-		SDL_SetColors(screen, image->format->palette->colors, 0, image->format->palette->ncolors);
-	}
-
-	//blit image onto screen surface
-	if (SDL_BlitSurface(image, NULL, screen, NULL) < 0 ) //<0 = fail
-		printf("Image failed to blit: %s\n", SDL_GetError());
-
-	//updated modified part of screen
-	SDL_UpdateRect(screen, 0, 0, image->w, image->h);
-
-	//free space allocated to bmp (its already on screen i guess)
-	SDL_FreeSurface(image);
-	return true;
 }
 
 SDL_Surface * g_loadImage(char * filename)
@@ -267,7 +289,7 @@ void g_loop()
 		
 		//update the display with latest updated data clear the screen and redraw everything
 		g_drawGame();
-//		SDL_Delay(2000);
+//		SDL_Delay(1000);
 //		printf("gamestate = %d\n", game.state);
 	}
 	g_end(); //exit to dos
@@ -470,7 +492,7 @@ void g_updateGame()
 		if ( !tetro_move(game.current, game.current->nextMoveDir) )
 		{
 			printf("[g_updateGame]: tetro_move failed!\n");
-			if ( game.current->nextMoveDir == DIR_SOUTH )
+			if ( game.current->nextMoveDir == DIR_SOUTH  || game.current->nextMoveDir == DIR_SOUTHWEST || game.current->nextMoveDir == DIR_SOUTHEAST )
 			{
 				g_onDownBlocked();
 			}
@@ -583,7 +605,19 @@ void g_drawGame()
 		//score, level, lines here
 		
 		//next block here
+		//image = g_loadImage("./pictures/blocktemp.bmp");
 		
+		for ( i = 0; i < TETRO_SIZE; i++ )
+		{
+			image = g_loadImage("./pictures/blocktemp.bmp");
+			x = stasisPixelCoordX[ stasisCoord[ tetro_getType(game.next) ].xCoord[i] ];
+			y = stasisPixelCoordY[ stasisCoord[ tetro_getType(game.next) ].yCoord[i] ];
+			//printf("[g_drawGame]: next block pixel coords = (%d, %d)\n", x, y);
+			
+			g_addSurface(x, y, image, screen);
+		}
+		//PUT THE LINE BELOW BACK INTO G_ADDSURFACE, AND MAKE A SEPERATE FUNCTION THAT DOESNT CLEAR IMAGE FOR NOW (G_ADDSURFACENOFREE)
+		//SDL_FreeSurface(image);
 		
 		//draw every block in play
 		for ( i = 0; i < SIZE_X; i++ )
@@ -690,5 +724,5 @@ void g_clearGrid()
 
 void g_onDownBlocked()
 {
-
+	printf("[g_onDownBlocked]!\n");
 }

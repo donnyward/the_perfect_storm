@@ -61,9 +61,6 @@ void g_end();
 //sets inital gameModule values, loads the game part of the game, and begins game play.
 void g_create();
 
-//takes a .bmp file and draws it on the screen
-boolean draw_bmp(char * filename);
-
 //loads an image, gets it optimized and ready for blitting
 SDL_Surface * g_loadImage(char * filename);
 

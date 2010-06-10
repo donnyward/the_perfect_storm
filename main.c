@@ -45,7 +45,7 @@ int main(int argc, char * argv[])
 	//set some initial values for the gameModule
 	g_init();
 	
-	SDL_Delay(2000); //wait, to see image for a bit
+//	SDL_Delay(2000); //wait, to see image for a bit
 
 
 	m_init(); //setup menu

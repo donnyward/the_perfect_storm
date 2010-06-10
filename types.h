@@ -56,6 +56,7 @@ typedef enum
 	TETRO_S,
 	TETRO_T,
 	TETRO_Z,
+	TETRO_RANDOM,
 } tetroShape_t;
 
 //directions

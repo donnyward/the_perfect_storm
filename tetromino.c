@@ -4,6 +4,7 @@
 #include "stdlib.h" //for malloc and NULL
 #include <stdio.h>
 
+//starting coords for tetrominos at the top of the playing field (in abstract coords)
 startCoord_t startCoord[] = 
 {
 	//I SHAPE
@@ -25,7 +26,13 @@ startCoord_t startCoord[] =
 	{ {3, 4, 5, 4}, {16, 16, 16, 15} },
 
 	//Z SHAPE
-	{ {3, 4, 4, 5}, {16, 16, 15, 15} },
+	{ {3, 4, 4, 5}, {16, 16, 15, 15} }
+};
+
+dir_t oppositeDir[] = 
+{
+	DIR_SOUTH, DIR_SOUTHWEST, DIR_WEST, DIR_NORTHWEST, DIR_NORTH,
+	DIR_NORTHEAST, DIR_EAST, DIR_SOUTHEAST, DIR_NONE
 };
 
 //===============================================
@@ -48,7 +55,7 @@ block * block_create(tetroShape_t type, tetromino * parent)
 	b->x = X_VOID;
 	b->y = Y_VOID;
 	b->moveDir = DIR_NONE;
-	b->sleep = false;
+	b->sleep = true;
 	
 	return b;
 }
@@ -220,6 +227,11 @@ void block_setParent(block * b, tetromino * parent)
 
 boolean block_setType(block * b, tetroShape_t type)
 {
+	if ( type == TETRO_RANDOM )
+	{
+	
+	}
+	
 	//bad data,
 	if ( type != TETRO_I && type != TETRO_J && type != TETRO_L && type != TETRO_O && type != TETRO_S && type != TETRO_T && type != TETRO_Z )
 		return false;
@@ -256,7 +268,7 @@ tetromino * tetro_create(tetroShape_t type)
 		t->children[i] = b;
 	}
 	
-	t->sleep = false;
+	t->sleep = true;
 	t->nextMoveX = DIR_NONE;
 	t->nextMoveY = DIR_NONE;
 	t->nextMoveDir = DIR_NONE;
@@ -275,7 +287,7 @@ boolean tetro_clear(tetromino * t)
 		if ( !block_doSleep(b) ) //put child to sleep
 		{
 			printf("[tetro_clear]: one of the children was already asleep! weird\n");
-			return false;
+			//return false;
 		}
 			
 		block_setParent(b, NULL); //unlink from parent	
@@ -290,23 +302,110 @@ boolean tetro_clear(tetromino * t)
 boolean tetro_move(tetromino * t, dir_t dir)
 {
 	int i;
+	int j;
 	int x, y;
 	block * b;
+	dir_t dX, dY;
+	boolean makeTwoMoves = true;
+	//boolean done = false;
 	
 	if ( dir == DIR_NONE )
 		return true;
 	
-	//make it so either all of the blocks will move in the direction, or none of them will
-	for ( i = 0; i < TETRO_SIZE; i++ )
+//===============================================
+//handles diagonal input
+	switch (dir)
 	{
-		b = t->children[i];
-//		x = start_coords[type][i][x][y];
-		//block_teleport(b, 
-		//x = block_getLocX(b);
-		//y = block_getLocY(b);
-		block_move(b, dir);
+		case DIR_NORTHWEST:
+			dX = DIR_WEST;
+			dY = DIR_NORTH;
+			break;
+		case DIR_NORTHEAST:
+			dX = DIR_EAST;
+			dY = DIR_NORTH;
+			break;
+		case DIR_SOUTHWEST:
+			dX = DIR_WEST;
+			dY = DIR_SOUTH;
+			break;
+		case DIR_SOUTHEAST:
+			dX = DIR_EAST;
+			dY = DIR_SOUTH;
+			break;
+		default:
+			makeTwoMoves = false;
+			break;
 	}
 	
+	if (makeTwoMoves)
+	{
+		//move x direction first, then in y direction
+		if ( tetro_move(t, dX) )
+		{
+			if ( tetro_move(t, dY) )
+				return true;
+			else
+				return false; //so we can repot g_onDownBlocked()
+		}
+		return false;
+	}
+//===============================================
+
+	//make it so either all of the blocks will move in the direction, or none of them will
+	//blocks must be moved in the correct order to prevent tetromino from tripping over itself
+	//blocks are indexed left to right, top to bottom
+	//depending on the move direction:
+	//left or up = move blocks in order 0-3
+	//right or down = move blocks in backwards order 3-0
+	if ( dir == DIR_WEST || dir == DIR_NORTH )
+	{
+		for ( i = 0; i < TETRO_SIZE; i++ )
+		{
+			b = t->children[i];
+			//x = start_coords[type][i][x][y];
+			//block_teleport(b, 
+			//x = block_getLocX(b);
+			//y = block_getLocY(b);
+			if ( !block_move(b, dir) )
+			{
+				//go back and unmove all the previous blocks
+				for ( j = i-1; j >= 0; j-- )
+				{
+					b = t->children[j];
+					block_move(b, oppositeDir[dir]);
+				}
+		
+				return false;
+			}
+		}
+	}
+	else if ( dir == DIR_EAST || dir == DIR_SOUTH )
+	{
+		for ( i = TETRO_SIZE-1; i >= 0; i-- )
+		{
+			b = t->children[i];
+			//x = start_coords[type][i][x][y];
+			//block_teleport(b, 
+			//x = block_getLocX(b);
+			//y = block_getLocY(b);
+			if ( !block_move(b, dir) )
+			{
+				//go back and unmove all the previous blocks
+				for ( j = i+1; j < TETRO_SIZE; j++ )
+				{
+					b = t->children[j];
+					block_move(b, oppositeDir[dir]);
+				}
+		
+				return false;
+			}
+		}
+	}
+	else
+	{
+		printf("[tetro_move]: weird dir, should be non-diagonal: %d\n", dir);
+		return false;
+	}
 	
 	return true;
 }
@@ -333,6 +432,9 @@ boolean tetro_moveStart(tetromino * t)
 			return false;
 	}
 	
+	if ( !tetro_doWake(t) )
+		debug_msg("[tetro_moveStart]: tetromino already awake?\n");
+	
 	return true;
 }
 
@@ -350,24 +452,39 @@ boolean tetro_isSleep(tetromino * t)
 
 boolean tetro_doSleep(tetromino * t)
 {
+	int i;
+	
 	if ( tetro_isSleep(t) )
 		return false;
 		
 	t->sleep = true;
+	
+	for ( i = 0; i < TETRO_SIZE; i++ )
+		block_doSleep(t->children[i]);
+		
 	return true;
 }
 
 boolean tetro_doWake(tetromino * t)
 {
+	int i;
+	
 	if ( !tetro_isSleep(t) )
 		return false;
 
 	t->sleep = false;
+	
+	for ( i = 0; i < TETRO_SIZE; i++ )
+		block_doWake(t->children[i]);
 	return true;
 }
 
 boolean tetro_setType(tetromino * t, tetroShape_t type)
 {
+	if ( type == TETRO_RANDOM )
+	{
+	
+	}
 	//bad data,
 	if ( type != TETRO_I && type != TETRO_J && type != TETRO_L && type != TETRO_O && type != TETRO_S && type != TETRO_T && type != TETRO_Z )
 		return false;
