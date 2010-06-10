@@ -4,6 +4,30 @@
 #include "stdlib.h" //for malloc and NULL
 #include <stdio.h>
 
+startCoord_t startCoord[] = 
+{
+	//I SHAPE
+	{ {3, 4, 5, 6}, {16, 16, 16, 16} },
+	
+	//J SHAPE
+	{ {3, 4, 5, 5}, {16, 16, 16, 15} },
+	
+	//L SHAPE
+	{ {3, 4, 5, 3}, {16, 16, 16, 15} },
+	
+	//O SHAPE
+	{ {4, 5, 4, 5}, {16, 16, 15, 15} },
+	
+	//S SHAPE
+	{ {4, 5, 3, 4}, {16, 16, 15, 15} },
+		
+	//T SHAPE
+	{ {3, 4, 5, 4}, {16, 16, 16, 15} },
+
+	//Z SHAPE
+	{ {3, 4, 4, 5}, {16, 16, 15, 15} },
+};
+
 //===============================================
 //Block functions below
 //===============================================
@@ -21,6 +45,10 @@ block * block_create(tetroShape_t type, tetromino * parent)
 	
 	//set parent of this block
 	block_setParent(b, parent);
+	b->x = X_VOID;
+	b->y = Y_VOID;
+	b->moveDir = DIR_NONE;
+	b->sleep = false;
 	
 	return b;
 }
@@ -28,6 +56,12 @@ block * block_create(tetroShape_t type, tetromino * parent)
 
 boolean block_clear(block * b)
 {
+	if (b == NULL)
+	{
+		debug_msg("[block_clear]: NULL argument passed!\n");
+		return false;
+	}
+	
 	if ( block_getParent(b) != NULL ) //block still has a parent, do not proceed
 	{
 		return false;
@@ -222,6 +256,7 @@ tetromino * tetro_create(tetroShape_t type)
 		t->children[i] = b;
 	}
 	
+	t->sleep = false;
 	t->nextMoveX = DIR_NONE;
 	t->nextMoveY = DIR_NONE;
 	t->nextMoveDir = DIR_NONE;
@@ -269,6 +304,7 @@ boolean tetro_move(tetromino * t, dir_t dir)
 		//block_teleport(b, 
 		//x = block_getLocX(b);
 		//y = block_getLocY(b);
+		block_move(b, dir);
 	}
 	
 	
@@ -289,6 +325,9 @@ boolean tetro_moveStart(tetromino * t)
 		//try writing the data to a binary file?
 //		x = start_coords[type][i].x;
 //		y = start_coords[type][i].y;
+		
+		x = startCoord[type].xCoord[i];
+		y = startCoord[type].yCoord[i];
 		
 		if ( !block_teleport(b, x, y) )
 			return false;

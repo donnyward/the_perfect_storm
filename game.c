@@ -90,6 +90,7 @@ int g_getLevel()
 
 block * g_getBlockAtPos(int x, int y)
 {
+	debug_msg("[g_getBlockAtPos]: starting...\n");
 	return game.pos[x][y];
 }
 
@@ -136,10 +137,11 @@ boolean g_removeBlockFromPos(block * b)
 
 void g_clear(gameOverReason_t r)
 {
-	//unload unneeded resources
-	g_clearGrid();
+	//clear tetrominoz
 	tetro_clear(game.next);
-	tetro_clear(game.current); //should already be cleared by g_clearGrid() since its on the grid somewhere
+	tetro_clear(game.current);
+	
+	g_clearGrid();
 	
 	//setup variables for menu
 	game.state = STATE_MENU;
@@ -158,11 +160,19 @@ void g_create()
 	game.level = 1;
 	game.score = 0;
 	game.lines = 0;
-	game.state = STATE_PLAYING; //state of the game
+	game.state = STATE_IDLE;
 	game.next = NULL;
 	game.current = NULL;
 
-	//
+	printf("Get Ready...\n");
+	
+	game.current = tetro_create(0);
+	game.next = tetro_create(1);
+	SDL_Delay(2000); //2 seconds
+	
+	printf("GO GO GO\n");
+	tetro_moveStart(game.current);
+	game.state = STATE_PLAYING;
 }
 
 boolean draw_bmp(char * filename)
@@ -198,12 +208,16 @@ SDL_Surface * g_loadImage(char * filename)
 {
 	SDL_Surface * loaded = NULL;
 	SDL_Surface * image = NULL;
+	Uint32 colorkey;
 	
 	loaded = SDL_LoadBMP(filename);
 	if ( loaded != NULL )
 	{
 		image = SDL_DisplayFormat(loaded); //converts loaded bmp into screen settings (if not already set to them)
 		SDL_FreeSurface(loaded);
+		
+		colorkey = SDL_MapRGB(image->format, COLORKEY_R, COLORKEY_G, COLORKEY_B);
+		SDL_SetColorKey(image, SDL_SRCCOLORKEY, colorkey);
 	}
 	else
 		return NULL;
@@ -253,7 +267,8 @@ void g_loop()
 		
 		//update the display with latest updated data clear the screen and redraw everything
 		g_drawGame();
-
+//		SDL_Delay(2000);
+//		printf("gamestate = %d\n", game.state);
 	}
 	g_end(); //exit to dos
 }
@@ -269,7 +284,7 @@ void g_handleInput()
 		{
 			case SDL_KEYDOWN:
 				//printf("[g_handleInput()]: A key was pushed down!\n");
-				if (game.state = STATE_MENU)
+				if (game.state == STATE_MENU)
 				{
 					switch (event.key.keysym.sym) //figure out what key
 					{
@@ -313,7 +328,7 @@ void g_handleInput()
 							break;
 					}
 				}
-				else if (game.state = STATE_PLAYING)
+				else if (game.state == STATE_PLAYING)
 				{
 					switch (event.key.keysym.sym) //figure out what key
 					{
@@ -321,6 +336,17 @@ void g_handleInput()
 							if (game.current->nextMoveY == DIR_NONE)
 								game.current->nextMoveY = DIR_SOUTH;
 							else if (game.current->nextMoveY == DIR_NORTH)
+							{
+								//cancel out opposite inputs
+								game.current->nextMoveY == DIR_NONE;
+							}
+							break;
+						case SDLK_UP:
+							if (!DEBUG_MODE)
+								break;
+							if (game.current->nextMoveY == DIR_NONE)
+								game.current->nextMoveY = DIR_NORTH;
+							else if (game.current->nextMoveY == DIR_SOUTH)
 							{
 								//cancel out opposite inputs
 								game.current->nextMoveY == DIR_NONE;
@@ -345,7 +371,9 @@ void g_handleInput()
 							}
 							break;
 						case SDLK_ESCAPE: //(bring up pause menu, or go back thru any menu that your in.)
-						
+							game.state = STATE_MENU;
+							menu.currentSelection = S_CONTINUE;
+							menu.menuLoc = M_PAUSE;
 						case SDLK_SPACE: //(rotate tertromino in this case)
 						
 						default:
@@ -385,7 +413,11 @@ void g_handleInput()
 
 void g_updateGame()
 {
-	if (game.state == STATE_MENU)
+	if (game.state == STATE_IDLE)
+	{
+		//do nothing
+	}
+	else if (game.state == STATE_MENU)
 	{
 		if (DEBUG_MODE)
 		{
@@ -400,8 +432,6 @@ void g_updateGame()
 			//too much output
 			//printf("[g_updateGame]: m_move returned false!\n");
 		}
-		//clean up menu options for next frame
-		menu.nextMoveDir = DIR_NONE;
 	}
 	else if (game.state == STATE_PLAYING)
 	{	
@@ -445,17 +475,22 @@ void g_updateGame()
 				g_onDownBlocked();
 			}
 		}
-			
-		//clear tetromino move values for next frame
+		
 		game.current->nextMoveX = DIR_NONE;
 		game.current->nextMoveY = DIR_NONE;
 		game.current->nextMoveDir = DIR_NONE;
-
+			
 	}
 	else
 	{
 		printf("[g_updateGame]: unknown game.state!\n");
 	}
+	
+	menu.nextMoveDir = DIR_NONE;
+	//clear tetromino move values for next frame
+//	game.current->nextMoveX = DIR_NONE;
+//	game.current->nextMoveY = DIR_NONE;
+//	game.current->nextMoveDir = DIR_NONE;
 }
 
 void g_getImageCoords(short i, short j, short * x, short * y)
@@ -549,6 +584,7 @@ void g_drawGame()
 		
 		//next block here
 		
+		
 		//draw every block in play
 		for ( i = 0; i < SIZE_X; i++ )
 		{
@@ -582,7 +618,10 @@ void g_drawGame()
 							image = g_loadImage("./pictures/BLOCK_Z.bmp");
 							break;
 					}
-					
+					if (image == NULL)
+					{
+						printf("[g_drawGame]: failed to load block image!\n");
+					}
 					g_getImageCoords(i, j, &x, &y);
 					g_addSurface(x, y, image, screen);
 				}					
@@ -611,30 +650,39 @@ void g_clearGrid()
 {
 	int x, y;
 	block * b;
-
+	debug_msg("[g_clearGrid]: starting...\n");
 	//set grid array to NULL
 	for ( x = 0; x < SIZE_X; x++ )
 	{
 		for ( y = 0; y < SIZE_Y; y++ )
 		{
 			b = g_getBlockAtPos(x, y);
+			//debug_msg("before if/else branches\n");
 			
-			if ( !block_clear(b) )
+			if ( b == NULL )
 			{
-				printf("[g_clearGrid]: block failed to clear! Clearing parent tetromino first...\n");
-				tetro_clear(block_getParent(b));
+				printf("[g_clearGrid]: no block located at (%d, %d)\n", x, y);
+			}
+			else
+			{
 				if ( !block_clear(b) )
-					printf("[g_clearGrid]: block STILL failed to clear! WTF?\n");
+				{
+					printf("[g_clearGrid]: block failed to clear! Clearing parent tetromino first...\n");
+					tetro_clear(block_getParent(b));
+					if ( !block_clear(b) )
+						printf("[g_clearGrid]: block STILL failed to clear! WTF?\n");
+					else
+					{
+						game.pos[x][y] = NULL;
+						printf("[g_clearGrid]: game.pos[%d][%d] set to NULL!\n", x, y);
+					}
+				}
 				else
 				{
 					game.pos[x][y] = NULL;
 					printf("[g_clearGrid]: game.pos[%d][%d] set to NULL!\n", x, y);
 				}
-			}
-			else
-			{
-				game.pos[x][y] = NULL;
-				printf("[g_clearGrid]: game.pos[%d][%d] set to NULL!\n", x, y);
+				//debug_msg("after if/else branches\n");
 			}
 		}
 	}

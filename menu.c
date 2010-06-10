@@ -87,6 +87,7 @@ boolean m_move()
 		if (menu.currentSelection == S_NEWGAME)
 		{
 			//start new game
+			g_create();
 		}
 		else if (menu.currentSelection == S_HIGHSCORES)
 		{
@@ -100,6 +101,7 @@ boolean m_move()
 		else if (menu.currentSelection == S_CONTINUE)
 		{
 			//resume game
+			game.state = STATE_PLAYING;
 		}
 		else if (menu.currentSelection == S_QUIT)
 		{

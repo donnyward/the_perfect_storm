@@ -1,7 +1,7 @@
 #ifndef __TYPES_H__
 #define __TYPES_H__
 
-#define DEBUG_MODE 0 //enables debug messages printed to terminal
+#define DEBUG_MODE 1 //enables extra debugging functionality (like moving blocks up lol lol)
 
 //===============================================
 //Game dimensions/constants
@@ -34,6 +34,10 @@
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 #define BIT_DEPTH 32
+
+#define COLORKEY_R 78
+#define COLORKEY_G 0
+#define COLORKEY_B 83
 
 //boolean type, accepts true or false
 typedef enum
@@ -73,8 +77,9 @@ typedef enum
 typedef enum
 {
 	STATE_PLAYING,
-	STATE_PAUSED, //same as menu
+	//STATE_PAUSED, //same as menu
 	STATE_MENU,
+	STATE_IDLE, //do nothing
 } gamestate_t;
 
 typedef enum
@@ -87,11 +92,16 @@ typedef enum
 //blocks 1-4 go from left to right, top to bottom (like reading)
 typedef struct
 {
-	short x;
-	short y;
-} pt;
+	short xCoord[TETRO_SIZE];
+	short yCoord[TETRO_SIZE];
+} startCoord_t;
+
+
 /*
 pt start_coords[TETRO_SHAPES][TETRO_SIZE];
+
+short start_coords[] = 
+{
 
 start_coords[TETRO_I][0].x = 3;
 start_coords[TETRO_I][0].y = 16;
