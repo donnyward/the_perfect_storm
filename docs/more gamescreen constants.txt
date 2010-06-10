@@ -1,0 +1,17 @@
+button dimensions = 320x80
+
+top left pixel locations:
+
+S_NEWGAME: (160, 180)
+
+S_HIGHSCORES: (160, 280)
+
+S_EXIT: (160, 380)
+
+S_CONTINUE: (160, 210)
+
+S_QUIT: (160, 310)
+
+S_YES: (160, 210)
+
+S_NO: (160, 310)

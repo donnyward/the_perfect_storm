@@ -35,10 +35,6 @@
 #define SCREEN_HEIGHT 480
 #define BIT_DEPTH 32
 
-//===============================================
-//Image placement offsets (from top-left of screen)
-//===============================================
-//#define 
 //boolean type, accepts true or false
 typedef enum
 {

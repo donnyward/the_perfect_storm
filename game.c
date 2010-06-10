@@ -68,12 +68,12 @@ typedef enum
 //pixel locations of the top left corner of each button image
 int buttonLocX[] = 
 {
-	
+	160, 160, 160, 160, 160, 160, 160
 };
 
 int buttonLocY[] = 
 {
-	
+	180, 280, 380, 210, 310, 210, 310
 };
 
 int frame = 0;
@@ -473,30 +473,64 @@ void g_drawGame()
 	if (game.state == STATE_MENU)
 	{
 		//draw the background followed by the buttons.
-		//the 'selected' button will have its highlighted version drawn
+		//the 'selected' button will have a highlight drawn over it
+		
+		/*
 		image = g_loadImage("./pictures/menubackground.bmp");
 		
 		if (image == NULL)
 			printf("[g_drawGame]: error loading an image!\n");
 			
 		g_addSurface(0, 0, image, screen);
-
+		*/
 		switch (menu.menuLoc)
 		{
 			case M_MAIN:
+				image = g_loadImage("./pictures/menubackground.bmp");
+				g_addSurface(0, 0, image, screen);
+				
+				image = g_loadImage("./pictures/NEWGAME_NOBORDER.bmp");
+				g_addSurface(buttonLocX[S_NEWGAME], buttonLocY[S_NEWGAME], image, screen);
+				image = g_loadImage("./pictures/HIGHSCORE_NOBORDER.bmp");
+				g_addSurface(buttonLocX[S_HIGHSCORES], buttonLocY[S_HIGHSCORES], image, screen);
+				image = g_loadImage("./pictures/EXIT_NOBORDER.bmp");
+				g_addSurface(buttonLocX[S_EXIT], buttonLocY[S_EXIT], image, screen);
 				break;
 			case M_HIGHSCORES:
 				break;
 			case M_PAUSE:
+				image = g_loadImage("./pictures/menupaused.bmp");
+				g_addSurface(0, 0, image, screen);
+				
+				image = g_loadImage("./pictures/CONTINUE_NOBORDER.bmp");
+				g_addSurface(buttonLocX[S_CONTINUE], buttonLocY[S_CONTINUE], image, screen);
+				image = g_loadImage("./pictures/QUITGAME_NOBORDER.bmp");
+				g_addSurface(buttonLocX[S_QUIT], buttonLocY[S_QUIT], image, screen);
 				break;
 			case M_PAUSECONFIRMQUIT:
+				image = g_loadImage("./pictures/menuconfirmquit.bmp");
+				g_addSurface(0, 0, image, screen);
+				
+				image = g_loadImage("./pictures/YES_NOBORDER.bmp");
+				g_addSurface(buttonLocX[S_YES], buttonLocY[S_YES], image, screen);
+				image = g_loadImage("./pictures/NO_NOBORDER.bmp");
+				g_addSurface(buttonLocX[S_NO], buttonLocY[S_NO], image, screen);
 				break;
 			case M_EXIT:
+				image = g_loadImage("./pictures/menu_exitconfirm.bmp");
+				g_addSurface(0, 0, image, screen);
+				
+				image = g_loadImage("./pictures/YES_NOBORDER.bmp");
+				g_addSurface(buttonLocX[S_YES], buttonLocY[S_YES], image, screen);
+				image = g_loadImage("./pictures/NO_NOBORDER.bmp");
+				g_addSurface(buttonLocX[S_NO], buttonLocY[S_NO], image, screen);
 				break;
 			default:
 				printf("[g_drawGame]: weird menu.menuLoc!\n");
 				break;
 		}
+		image = g_loadImage("./pictures/BORDER_GREEN.bmp");
+		g_addSurface(buttonLocX[menu.currentSelection], buttonLocY[menu.currentSelection], image, screen);
 	}
 	else if (game.state == STATE_PLAYING)
 	{
