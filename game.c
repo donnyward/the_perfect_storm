@@ -217,8 +217,8 @@ void g_create()
 
 	printf("Get Ready...\n");
 	
-	game.current = tetro_create(6);
-	game.next = tetro_create(1);
+	game.current = tetro_create(TETRO_RANDOM);
+	game.next = tetro_create(TETRO_RANDOM);
 //	SDL_Delay(2000); //2 seconds
 	
 	printf("GO GO GO\n");
@@ -725,4 +725,20 @@ void g_clearGrid()
 void g_onDownBlocked()
 {
 	printf("[g_onDownBlocked]!\n");
+	if ( !tetro_clear(game.current) )
+	{
+		printf("[g_onDownBlocked]: game.current failed to clear!\n");
+	}
+	
+	//calculate / move down lines here
+	
+	
+	game.current = game.next;
+	game.next = NULL;
+	game.next = tetro_create(TETRO_RANDOM);
+	if ( !tetro_moveStart(game.current) )
+	{
+		printf("[g_onDownBlocked]: GAME OVER!\n");
+		game.state = STATE_IDLE;
+	}
 }

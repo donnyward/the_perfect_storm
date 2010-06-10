@@ -106,7 +106,7 @@ boolean tetro_isSleep(tetromino * t);
 //makes tetromino sleep, fails if tetromino already asleep
 boolean tetro_doSleep(tetromino * t);
 
-//makes tetromino wake, fails if tetromino already awake
+//makes tetromino wake, including all its blocks, fails if tetromino already awake
 boolean tetro_doWake(tetromino * t);
 
 //sets type of a tetro to a tetroShape_t type. returns false if a bad type is given.

@@ -256,6 +256,11 @@ tetromino * tetro_create(tetroShape_t type)
 	tetromino  * t = (tetromino *)(malloc(sizeof(tetromino)));
 	block * b;
 	
+	if ( type == TETRO_RANDOM )
+	{
+		type = TETRO_O;
+	}
+	
 	if ( !tetro_setType(t, type) )
 		return NULL;
 		
@@ -481,10 +486,6 @@ boolean tetro_doWake(tetromino * t)
 
 boolean tetro_setType(tetromino * t, tetroShape_t type)
 {
-	if ( type == TETRO_RANDOM )
-	{
-	
-	}
 	//bad data,
 	if ( type != TETRO_I && type != TETRO_J && type != TETRO_L && type != TETRO_O && type != TETRO_S && type != TETRO_T && type != TETRO_Z )
 		return false;
