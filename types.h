@@ -1,7 +1,7 @@
 #ifndef __TYPES_H__
 #define __TYPES_H__
 
-#define DEBUG_MODE 1 //enables extra debugging functionality (like moving blocks up lol lol)
+#define DEBUG_MODE 0 //enables extra debugging functionality (like moving blocks up lol lol)
 
 //===============================================
 //Game dimensions/constants

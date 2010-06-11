@@ -1,7 +1,7 @@
 //#include "block.h"
 #include "tetromino.h"
 #include "types.h"
-#include "stdlib.h" //for malloc and NULL
+#include "stdlib.h" //for malloc and NULL and rand()
 #include <stdio.h>
 
 //starting coords for tetrominos at the top of the playing field (in abstract coords)
@@ -253,12 +253,17 @@ tetroShape_t block_getType(block * b)
 tetromino * tetro_create(tetroShape_t type)
 {
 	int i;
+	int random;
 	tetromino  * t = (tetromino *)(malloc(sizeof(tetromino)));
 	block * b;
 	
 	if ( type == TETRO_RANDOM )
 	{
-		type = TETRO_O;
+		//random number from 0 to 6
+		random = (rand()/(RAND_MAX+1.0)) * (TETRO_SHAPES-1);
+		//random = (int)((rand()/(RAND_MAX +1.0))*11);
+		printf("[tetro_create]: random number = %d\n", random);
+		type = random;
 	}
 	
 	if ( !tetro_setType(t, type) )
