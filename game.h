@@ -98,5 +98,9 @@ void g_clearGrid();
 //and acts accordingly. then calls next tetromino into play, and creates the next one that waits in stasis
 void g_onDownBlocked();
 
+//check to see if a row is filled with blox returns an 
+boolean g_checkFullRow(int row);
+
+//void g_flashBlocks(
 
 #endif

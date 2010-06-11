@@ -724,13 +724,120 @@ void g_clearGrid()
 
 void g_onDownBlocked()
 {
+	int rowTop = 0;
+	int rowBottom = 0;
+	short i, j, k;
+	short x = -1, y = -1;
+	int count = 0;
+	SDL_Surface * blockFlash;
+	block * b;
+	
+	short fullRows[4] = 
+	{
+		-1, -1, -1, -1
+	};
+	
 	printf("[g_onDownBlocked]!\n");
+
+	
+	//calculate / move down lines here
+	//only check the rows that the tetromino is/was at when it stopped
+	//the above blocks only move down the number of rows equal to those cleared
+	tetro_getRows(game.current, &rowTop, &rowBottom);
+	printf("[g_onDownBlocked]: rowTop: %d, rowBottom: %d\n", rowTop, rowBottom);
+	
 	if ( !tetro_clear(game.current) )
 	{
 		printf("[g_onDownBlocked]: game.current failed to clear!\n");
 	}
 	
-	//calculate / move down lines here
+	for ( i = rowBottom; i <= rowTop; i++ )
+	{
+		if ( g_checkFullRow(i) )
+		{
+			printf("[g_onDownBlocked]: full row at %d!\n", i);
+			fullRows[count] = i;
+			count++;
+		}
+		else
+			printf("[g_onDownBlocked]: no full row at %d!\n", i);
+	}
+	
+	printf("[g_onDownBlocked]: number of rows filled = %d\n", count);
+	
+	if ( count > 0 )
+	{
+		printf("[g_onDownBlocked]: start flashing\n");
+		//k = index for a row to flash
+		//i = current x position
+		//j = y position (row). fullRows[k]
+		for ( k = 0; k < count; k++ )
+		{
+			for ( i = 0; i < SIZE_X; i++ )
+			{
+				blockFlash = g_loadImage("./pictures/blockhighlight.bmp");
+				g_getImageCoords(i, fullRows[k], &x, &y);
+				g_addSurface(x, y, blockFlash, screen);
+			}
+		}
+		
+		SDL_Flip(screen);
+		SDL_Delay(150);
+		
+		for ( k = 0; k < count; k++ )
+		{
+			for ( i = 0; i < SIZE_X; i++ )
+			{
+				blockFlash = g_loadImage("./pictures/blocktemp.bmp");
+				g_getImageCoords(i, fullRows[k], &x, &y);
+				g_addSurface(x, y, blockFlash, screen);
+			}
+		}
+		
+		SDL_Flip(screen);
+		SDL_Delay(150);
+		
+		for ( k = 0; k < count; k++ )
+		{
+			for ( i = 0; i < SIZE_X; i++ )
+			{
+				blockFlash = g_loadImage("./pictures/blockhighlight.bmp");
+				g_getImageCoords(i, fullRows[k], &x, &y);
+				g_addSurface(x, y, blockFlash, screen);
+			}
+		}
+		
+		SDL_Flip(screen);
+		SDL_Delay(150);
+		
+		for ( k = 0; k < count; k++ )
+		{
+			for ( i = 0; i < SIZE_X; i++ )
+			{
+				blockFlash = g_loadImage("./pictures/blockhightemp.bmp");
+				g_getImageCoords(i, fullRows[k], &x, &y);
+				g_addSurface(x, y, blockFlash, screen);
+			}
+		}
+		
+		SDL_Flip(screen);
+		//SDL_Delay(250);
+		printf("[g_onDownBlocked]: finished flashing\n");
+		
+		for ( k = 0; k < count; k++ )
+		{
+			for ( i = 0; i < SIZE_X; i++ )
+			{
+				b = g_getBlockAtPos(i, fullRows[k]);
+				g_removeBlockFromPos(b);
+				if ( block_clear(b) )
+					printf("[g_onDownBlocked]: block at (%d, %d) removed\n", i, fullRows[k]);
+				else
+					printf("[g_onDownBlocked]: no block removed at (%d, %d)\n", i, fullRows[k]);
+			}
+		}
+	}
+	
 	
 	
 	game.current = game.next;
@@ -741,4 +848,17 @@ void g_onDownBlocked()
 		printf("[g_onDownBlocked]: GAME OVER!\n");
 		game.state = STATE_IDLE;
 	}
+}
+
+boolean g_checkFullRow(int row)
+{
+	int i;
+	
+	for ( i = 0; i < SIZE_X; i++ )
+	{
+		printf("[g_checkFullRow]: checking row %d, column %d\n", row, i);
+		if ( g_getBlockAtPos(i, row) == NULL )
+			return false;
+	}
+	return true;
 }

@@ -264,6 +264,8 @@ tetromino * tetro_create(tetroShape_t type)
 		//random = (int)((rand()/(RAND_MAX +1.0))*11);
 		printf("[tetro_create]: random number = %d\n", random);
 		type = random;
+		
+		type = TETRO_O;
 	}
 	
 	if ( !tetro_setType(t, type) )
@@ -504,4 +506,19 @@ boolean tetro_setType(tetromino * t, tetroShape_t type)
 tetroShape_t tetro_getType(tetromino * t)
 {
 	return t->type;
+}
+
+void tetro_getRows(tetromino * t, int * upper, int * lower)
+{
+	int temp;
+
+	*upper = t->children[1]->y;
+	*lower = t->children[3]->y;
+	
+	if (lower > upper)
+	{
+		temp = *lower;
+		*lower = *upper;
+		*upper = temp;
+	}
 }
