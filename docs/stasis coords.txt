@@ -1,0 +1,16 @@
+4 blocks wide = 100 pixels
+2 blocks high = 50 pixels
+
+(rounded up) top left corner of box = (458, 190)
+bottom right corner of box = (576, 284)
+
+box width = 118 pixels
+9 pixels on each side to center
+
+box height = 94 pixels
+44 pixels on top and bottom
+
+so if a block is in the top left corner, the coord of the topleft of that 1st block is (458+9, 190+44). (467, 234)
+
+for each block to the right, add 25 to that
+for each block below, add 25 to that

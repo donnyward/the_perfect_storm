@@ -39,6 +39,8 @@
 #define COLORKEY_G 0
 #define COLORKEY_B 83
 
+#define FLASH_FRAMES 8 //even number = last flash frame before disappear is "normal" unflashed block
+
 //boolean type, accepts true or false
 typedef enum
 {

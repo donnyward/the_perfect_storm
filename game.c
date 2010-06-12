@@ -247,6 +247,36 @@ SDL_Surface * g_loadImage(char * filename)
 	return image;
 }
 
+SDL_Surface * g_loadBlockImage(tetroShape_t type)
+{
+	SDL_Surface * image;
+	switch (type)
+	{
+		case TETRO_I:
+			image = g_loadImage("./pictures/BLOCK_I.bmp");
+			break;
+		case TETRO_J:
+			image = g_loadImage("./pictures/BLOCK_J.bmp");
+			break;
+		case TETRO_L:
+			image = g_loadImage("./pictures/BLOCK_L.bmp");
+			break;
+		case TETRO_O:
+			image = g_loadImage("./pictures/BLOCK_O.bmp");
+			break;
+		case TETRO_S:
+			image = g_loadImage("./pictures/BLOCK_S.bmp");
+			break;
+		case TETRO_T:
+			image = g_loadImage("./pictures/BLOCK_T.bmp");
+			break;
+		case TETRO_Z:
+			image = g_loadImage("./pictures/BLOCK_Z.bmp");
+			break;
+	}
+	return image;
+}
+
 boolean g_addSurface(int x, int y, SDL_Surface * source, SDL_Surface * dest)
 {
 	SDL_Rect offset;
@@ -604,20 +634,17 @@ void g_drawGame()
 		
 		//score, level, lines here
 		
-		//next block here
-		//image = g_loadImage("./pictures/blocktemp.bmp");
-		
+		//draw next block in the box
 		for ( i = 0; i < TETRO_SIZE; i++ )
 		{
-			image = g_loadImage("./pictures/blocktemp.bmp");
+			//image = g_loadImage("./pictures/blocktemp.bmp");
+			image = g_loadBlockImage(tetro_getType(game.next));
 			x = stasisPixelCoordX[ stasisCoord[ tetro_getType(game.next) ].xCoord[i] ];
 			y = stasisPixelCoordY[ stasisCoord[ tetro_getType(game.next) ].yCoord[i] ];
 			//printf("[g_drawGame]: next block pixel coords = (%d, %d)\n", x, y);
 			
 			g_addSurface(x, y, image, screen);
 		}
-		//PUT THE LINE BELOW BACK INTO G_ADDSURFACE, AND MAKE A SEPERATE FUNCTION THAT DOESNT CLEAR IMAGE FOR NOW (G_ADDSURFACENOFREE)
-		//SDL_FreeSurface(image);
 		
 		//draw every block in play
 		for ( i = 0; i < SIZE_X; i++ )
@@ -628,30 +655,8 @@ void g_drawGame()
 				
 				if (b != NULL)
 				{
-					switch (block_getType(b))
-					{
-						case TETRO_I:
-							image = g_loadImage("./pictures/BLOCK_I.bmp");
-							break;
-						case TETRO_J:
-							image = g_loadImage("./pictures/BLOCK_J.bmp");
-							break;
-						case TETRO_L:
-							image = g_loadImage("./pictures/BLOCK_L.bmp");
-							break;
-						case TETRO_O:
-							image = g_loadImage("./pictures/BLOCK_O.bmp");
-							break;
-						case TETRO_S:
-							image = g_loadImage("./pictures/BLOCK_S.bmp");
-							break;
-						case TETRO_T:
-							image = g_loadImage("./pictures/BLOCK_T.bmp");
-							break;
-						case TETRO_Z:
-							image = g_loadImage("./pictures/BLOCK_Z.bmp");
-							break;
-					}
+					image = g_loadBlockImage(block_getType(b));
+
 					if (image == NULL)
 					{
 						printf("[g_drawGame]: failed to load block image!\n");
@@ -731,6 +736,7 @@ void g_onDownBlocked()
 	int count = 0;
 	SDL_Surface * blockFlash;
 	block * b;
+	int flashCount;
 	
 	short fullRows[4] = 
 	{
@@ -765,65 +771,36 @@ void g_onDownBlocked()
 	
 	printf("[g_onDownBlocked]: number of rows filled = %d\n", count);
 	
+	//full line(s) exist, flash them then remove, then drop above blocks down
 	if ( count > 0 )
 	{
 		printf("[g_onDownBlocked]: start flashing\n");
 		//k = index for a row to flash
 		//i = current x position
 		//j = y position (row). fullRows[k]
-		for ( k = 0; k < count; k++ )
+		for ( flashCount = 0; flashCount < FLASH_FRAMES; flashCount++ )
 		{
-			for ( i = 0; i < SIZE_X; i++ )
+			for ( k = 0; k < count; k++ )
 			{
-				blockFlash = g_loadImage("./pictures/blockhighlight.bmp");
-				g_getImageCoords(i, fullRows[k], &x, &y);
-				g_addSurface(x, y, blockFlash, screen);
+				for ( i = 0; i < SIZE_X; i++ )
+				{
+					b = g_getBlockAtPos(i, fullRows[k]);
+					
+					if ( flashCount % 2 == 1 )
+						blockFlash = g_loadBlockImage(block_getType(b));
+					else
+						blockFlash = g_loadImage("./pictures/BLOCK_FLASH1.bmp");
+					g_getImageCoords(i, fullRows[k], &x, &y);
+					g_addSurface(x, y, blockFlash, screen);
+				}
 			}
+		
+			SDL_Flip(screen);
+			SDL_Delay(150);
 		}
-		
-		SDL_Flip(screen);
-		SDL_Delay(150);
-		
-		for ( k = 0; k < count; k++ )
-		{
-			for ( i = 0; i < SIZE_X; i++ )
-			{
-				blockFlash = g_loadImage("./pictures/blocktemp.bmp");
-				g_getImageCoords(i, fullRows[k], &x, &y);
-				g_addSurface(x, y, blockFlash, screen);
-			}
-		}
-		
-		SDL_Flip(screen);
-		SDL_Delay(150);
-		
-		for ( k = 0; k < count; k++ )
-		{
-			for ( i = 0; i < SIZE_X; i++ )
-			{
-				blockFlash = g_loadImage("./pictures/blockhighlight.bmp");
-				g_getImageCoords(i, fullRows[k], &x, &y);
-				g_addSurface(x, y, blockFlash, screen);
-			}
-		}
-		
-		SDL_Flip(screen);
-		SDL_Delay(150);
-		
-		for ( k = 0; k < count; k++ )
-		{
-			for ( i = 0; i < SIZE_X; i++ )
-			{
-				blockFlash = g_loadImage("./pictures/blockhightemp.bmp");
-				g_getImageCoords(i, fullRows[k], &x, &y);
-				g_addSurface(x, y, blockFlash, screen);
-			}
-		}
-		
-		SDL_Flip(screen);
-		//SDL_Delay(250);
 		printf("[g_onDownBlocked]: finished flashing\n");
 		
+		//remove all those blocks
 		for ( k = 0; k < count; k++ )
 		{
 			for ( i = 0; i < SIZE_X; i++ )
@@ -836,6 +813,9 @@ void g_onDownBlocked()
 					printf("[g_onDownBlocked]: no block removed at (%d, %d)\n", i, fullRows[k]);
 			}
 		}
+		
+		//move downt he above blocks
+		g_dropAboveBlocksDown((fullRows[0])+1, count);
 	}
 	
 	
@@ -861,4 +841,39 @@ boolean g_checkFullRow(int row)
 			return false;
 	}
 	return true;
+}
+
+void g_dropAboveBlocksDown(int startRow, int count)
+{
+/*
+currently a bug exists in the logic. right now it starts at the first full line row (which is now empty)
+and goes from that row to the top, moving every block it comes across down a number equal to count.
+what must be done however is each row moves down a number equal to the number of rows that were cleared below it
+*/
+	//start from bottom most row and go up
+	int i, j;
+	int currentRow, column;
+	block * b = NULL;
+	
+	for ( currentRow = startRow; currentRow < SIZE_Y; currentRow++ )
+	{
+		for ( j = 0; j < SIZE_X; j++ )
+		{
+			b = g_getBlockAtPos(j, currentRow);
+			if ( b != NULL )
+			{
+				for ( i = 0; i < count; i++ )
+				{
+					if ( block_move(b, DIR_SOUTH) )
+					{
+						printf("[g_dropAboveBlocksDown]: block at (%d, %d) moved down!\n", j, currentRow);
+					}
+					else
+					{
+						printf("[g_dropAboveBlocksDown]: block at (%d, %d) could not move down!\n", j, currentRow);
+					}
+				}
+			}
+		}
+	}
 }

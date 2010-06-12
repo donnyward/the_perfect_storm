@@ -265,7 +265,7 @@ tetromino * tetro_create(tetroShape_t type)
 		printf("[tetro_create]: random number = %d\n", random);
 		type = random;
 		
-		type = TETRO_O;
+		//type = TETRO_O;
 	}
 	
 	if ( !tetro_setType(t, type) )

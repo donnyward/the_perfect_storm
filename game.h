@@ -64,6 +64,9 @@ void g_create();
 //loads an image, gets it optimized and ready for blitting
 SDL_Surface * g_loadImage(char * filename);
 
+//loads the correct image for a type of tetromino
+SDL_Surface * g_loadBlockImage(tetroShape_t type);
+
 //takes a surface (containing a loaded image) and applys it to the main screen surface
 //with or without an offset
 //the screen must be flipped once all the adding is done
@@ -101,6 +104,9 @@ void g_onDownBlocked();
 //check to see if a row is filled with blox returns an 
 boolean g_checkFullRow(int row);
 
-//void g_flashBlocks(
+//void g_flashBlocks()
+
+//drops the blocks starting at startRow and above down count times.
+void g_dropAboveBlocksDown(int startRow, int count);
 
 #endif
