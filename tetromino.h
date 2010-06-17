@@ -27,6 +27,9 @@ typedef struct tetromino
 	dir_t nextMoveY;
 	dir_t nextMoveDir;
 	
+	int pivot; //is set in tetro_setType
+	int rotation; //0-3, alwyas starts at 0. initialized in tetro_create
+	boolean tryRotate;
 } tetromino;
 
 //===============================================
@@ -95,7 +98,7 @@ boolean tetro_move(tetromino * t, dir_t dir);
 //teleports tetromino to starting position by teleporting its child blocks.
 //position is based on it's type. fails if any of the child blocks fail to get into position,
 //at which point the game is lost.
-boolean tetro_moveStart(tetromino * t);
+boolean tetro_moveToStart(tetromino * t);
 
 //rotates the tetromino 90 degrees clockwise. returns false if rotated position is blocked.
 boolean tetro_rotate(tetromino * t);

@@ -38,6 +38,9 @@ int g_getScore();
 //returns the current level the player is on (integer)
 int g_getLevel();
 
+//returns true if coords are out of bounds, false if not
+boolean g_isLocOutOfBounds(int x, int y);
+
 //returns a pointer to the block that is at a specific coordinate (using the 2d array).
 //Returns null if no block there.
 block * g_getBlockAtPos(int x, int y);

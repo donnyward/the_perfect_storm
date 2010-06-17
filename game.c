@@ -63,7 +63,7 @@ short stasisPixelCoordY[] =
 };
 
 //these coords are the 4x2 grid that the the "next" box contains
-startCoord_t stasisCoord[] = 
+coord_t stasisCoord[] = 
 {
 	//I SHAPE
 	{ {0, 1, 2, 3}, {0, 0, 0, 0} },
@@ -99,9 +99,21 @@ int g_getLevel()
 	return game.level;
 }
 
+boolean g_isLocOutOfBounds(int x, int y)
+{
+	if ( x < X_MIN || x > X_MAX || y < Y_MIN || y > Y_MAX ) //destination is out of bounds
+		return true;
+	else
+		return false;
+}
+
 block * g_getBlockAtPos(int x, int y)
 {
 	//debug_msg("[g_getBlockAtPos]: starting...\n");
+	
+	if ( g_isLocOutOfBounds(x, y) )
+		return NULL;
+	
 	return game.pos[x][y];
 }
 
@@ -111,11 +123,7 @@ boolean g_setBlockToPos(block * b, int x, int y)
 	int y_old = block_getLocY(b);
 	block * b2 = g_getBlockAtPos(x, y);
 
-	if ( b2 != NULL ) //another block is already here at destination
-	{
-		return false;
-	}
-	else if ( x < X_MIN || x > X_MAX || y < Y_MIN || y > Y_MAX ) //destination is out of bounds
+	if ( b2 != NULL || g_isLocOutOfBounds(x, y) ) //another block is already here at destination
 	{
 		return false;
 	}
@@ -130,53 +138,13 @@ boolean g_setBlockToPos(block * b, int x, int y)
 		return true;
 	}
 }
-/*
-boolean g_setBlockToPos(block * b, int x, int y)
-{
-	int x_old = block_getLocX(b);
-	int y_old = block_getLocY(b);
-	block * b2 = g_getBlockAtPos(x, y);
-	
-	if ( x < X_MIN || x > X_MAX || y < Y_MIN || y > Y_MAX ) //destination is out of bounds
-	{
-		printf("[g_setBlockToPos]: (%d, %d) is out of bounds!\n");
-		return false;
-	}
-	else if ( b2 != NULL ) //another block is already here at destination
-	{
-		//return false;
-		printf("[g_setBlockToPos]: warning, a block already at (%d, %d)\n", x, y);
-		
-		if ( block_getParent(b2) == block_getParent(b) )
-		{
-			printf("[g_setBlockToPos]: the two blocks are of the same parent so it is fine\n");
-			
-			//return true;
-		}
-		else
-		{
-			printf("[g_setBlockToPos]: the two blocks are of different parent, can not move\n");
-			return false;
-		}
-		
-	}
-	
 
-	//if ( !g_removeBlockFromPos(b) ) //its original position was invalid
-	//	debug_msg("[g_setBlockToPos]: Block tried to remove from pos: Failed!\n");
-			
-	game.pos[x][y] = b;
-	block_setLocX(b, x);
-	block_setLocY(b, y);
-	return true;
-}
-*/
 boolean g_removeBlockFromPos(block * b)
 {
 	int x = block_getLocX(b);
 	int y = block_getLocY(b);
 	
-	if ( x < X_MIN || x > X_MAX || y < Y_MIN || y > Y_MAX ) //destination is out of bounds
+	if ( g_isLocOutOfBounds(x, y) )
 	{
 		debug_msg("[g_removeBlockFromPos]: target is out of bounds!\n");
 		return false;
@@ -222,7 +190,7 @@ void g_create()
 //	SDL_Delay(2000); //2 seconds
 	
 	printf("GO GO GO\n");
-	tetro_moveStart(game.current);
+	tetro_moveToStart(game.current);
 	game.state = STATE_PLAYING;
 }
 
@@ -426,8 +394,10 @@ void g_handleInput()
 							game.state = STATE_MENU;
 							menu.currentSelection = S_CONTINUE;
 							menu.menuLoc = M_PAUSE;
+							break;
 						case SDLK_SPACE: //(rotate tertromino in this case)
-						
+							game.current->tryRotate = true;
+							break;
 						default:
 							break;
 					}
@@ -498,40 +468,52 @@ void g_updateGame()
 			
 		*/
 			
-		//create resultant move direction
-		if ( game.current->nextMoveX == DIR_NONE )
-			game.current->nextMoveDir = game.current->nextMoveY;
-		else if ( game.current->nextMoveY == DIR_NONE )
-			game.current->nextMoveDir = game.current->nextMoveX;
-		else if ( game.current->nextMoveY == DIR_NORTH )
+		//rotate has priority
+		if ( game.current->tryRotate )
 		{
-			if ( game.current->nextMoveX == DIR_WEST )
-				game.current->nextMoveDir = DIR_NORTHWEST;
+			printf("[g_updateGame]: trying rotate...\n");
+			if ( tetro_rotate(game.current) )
+				printf("[g_updateGame]: rotate success!\n");
 			else
-				game.current->nextMoveDir = DIR_NORTHEAST;
+				printf("[g_updateGame]: rotate failed!\n");
 		}
-		else //nextMoveY == south
+		else
 		{
-			if ( game.current->nextMoveX == DIR_WEST )
-				game.current->nextMoveDir = DIR_SOUTHWEST;
-			else
-				game.current->nextMoveDir = DIR_SOUTHEAST;
-		}
-			
-		//attempt to move tetro in this direction
-		if ( !tetro_move(game.current, game.current->nextMoveDir) )
-		{
-			printf("[g_updateGame]: tetro_move failed!\n");
-			if ( game.current->nextMoveDir == DIR_SOUTH  || game.current->nextMoveDir == DIR_SOUTHWEST || game.current->nextMoveDir == DIR_SOUTHEAST )
+			//create resultant move direction
+			if ( game.current->nextMoveX == DIR_NONE )
+				game.current->nextMoveDir = game.current->nextMoveY;
+			else if ( game.current->nextMoveY == DIR_NONE )
+				game.current->nextMoveDir = game.current->nextMoveX;
+			else if ( game.current->nextMoveY == DIR_NORTH )
 			{
-				g_onDownBlocked();
+				if ( game.current->nextMoveX == DIR_WEST )
+					game.current->nextMoveDir = DIR_NORTHWEST;
+				else
+					game.current->nextMoveDir = DIR_NORTHEAST;
+			}
+			else //nextMoveY == south
+			{
+				if ( game.current->nextMoveX == DIR_WEST )
+					game.current->nextMoveDir = DIR_SOUTHWEST;
+				else
+					game.current->nextMoveDir = DIR_SOUTHEAST;
+			}
+			
+			//attempt to move tetro in this direction
+			if ( !tetro_move(game.current, game.current->nextMoveDir) )
+			{
+				printf("[g_updateGame]: tetro_move failed!\n");
+				if ( game.current->nextMoveDir == DIR_SOUTH  || game.current->nextMoveDir == DIR_SOUTHWEST || game.current->nextMoveDir == DIR_SOUTHEAST )
+				{
+					g_onDownBlocked();
+				}
 			}
 		}
 		
 		game.current->nextMoveX = DIR_NONE;
 		game.current->nextMoveY = DIR_NONE;
 		game.current->nextMoveDir = DIR_NONE;
-			
+		game.current->tryRotate = false;
 	}
 	else
 	{
@@ -823,7 +805,7 @@ void g_onDownBlocked()
 	game.current = game.next;
 	game.next = NULL;
 	game.next = tetro_create(TETRO_RANDOM);
-	if ( !tetro_moveStart(game.current) )
+	if ( !tetro_moveToStart(game.current) )
 	{
 		printf("[g_onDownBlocked]: GAME OVER!\n");
 		game.state = STATE_IDLE;
@@ -846,7 +828,8 @@ boolean g_checkFullRow(int row)
 void g_dropAboveBlocksDown(int startRow, int count)
 {
 /*
-currently a bug exists in the logic. right now it starts at the first full line row (which is now empty)
+currently a bug exists in the logic. right now it starts at the first row above the bottommost
+full row (which is now empty),
 and goes from that row to the top, moving every block it comes across down a number equal to count.
 what must be done however is each row moves down a number equal to the number of rows that were cleared below it
 */

@@ -28,6 +28,18 @@
 #define PLAYING_FIELD_Y_MIN 30
 #define PLAYING_FIELD_X_MAX 445
 #define PLAYING_FIELD_Y_MAX 480
+
+//which block (0-3) is the pivot block
+#define PIVOT_I 1
+#define PIVOT_J 1
+#define PIVOT_L 1
+#define PIVOT_O 0
+#define PIVOT_S 0
+#define PIVOT_T 1
+#define PIVOT_Z 1
+
+#define NIL 0
+
 //===============================================
 //Video settings
 //===============================================
@@ -58,7 +70,7 @@ typedef enum
 	TETRO_S,
 	TETRO_T,
 	TETRO_Z,
-	TETRO_RANDOM,
+	TETRO_RANDOM, //altered in tetro_create
 } tetroShape_t;
 
 //directions
@@ -97,77 +109,6 @@ typedef struct
 {
 	short xCoord[TETRO_SIZE];
 	short yCoord[TETRO_SIZE];
-} startCoord_t;
-
-
-/*
-pt start_coords[TETRO_SHAPES][TETRO_SIZE];
-
-short start_coords[] = 
-{
-
-start_coords[TETRO_I][0].x = 3;
-start_coords[TETRO_I][0].y = 16;
-start_coords[TETRO_I][1].x = 4;
-start_coords[TETRO_I][1].y = 16;
-start_coords[TETRO_I][2].x = 5;
-start_coords[TETRO_I][2].y = 16;
-start_coords[TETRO_I][3].x = 6;
-start_coords[TETRO_I][3].y = 16;
-
-start_coords[TETRO_J][0].x = 3;
-start_coords[TETRO_J][0].y = 16;
-start_coords[TETRO_J][1].x = 4;
-start_coords[TETRO_J][1].y = 16;
-start_coords[TETRO_J][2].x = 5;
-start_coords[TETRO_J][2].y = 16;
-start_coords[TETRO_J][3].x = 5;
-start_coords[TETRO_J][3].y = 15;
-
-start_coords[TETRO_L][0].x = 3;
-start_coords[TETRO_L][0].y = 16;
-start_coords[TETRO_L][1].x = 4;
-start_coords[TETRO_L][1].y = 16;
-start_coords[TETRO_L][2].x = 5;
-start_coords[TETRO_L][2].y = 16;
-start_coords[TETRO_L][3].x = 3;
-start_coords[TETRO_L][3].y = 15;
-
-start_coords[TETRO_O][0].x = 4;
-start_coords[TETRO_O][0].y = 16;
-start_coords[TETRO_O][1].x = 5;
-start_coords[TETRO_O][1].y = 16;
-start_coords[TETRO_O][2].x = 4;
-start_coords[TETRO_O][2].y = 15;
-start_coords[TETRO_O][3].x = 3;
-start_coords[TETRO_O][3].y = 15;
-
-start_coords[TETRO_S][0].x = 4;
-start_coords[TETRO_S][0].y = 16;
-start_coords[TETRO_S][1].x = 5;
-start_coords[TETRO_S][1].y = 16;
-start_coords[TETRO_S][2].x = 3;
-start_coords[TETRO_S][2].y = 15;
-start_coords[TETRO_S][3].x = 4;
-start_coords[TETRO_S][3].y = 15;
-
-start_coords[TETRO_T][0].x = 3;
-start_coords[TETRO_T][0].y = 16;
-start_coords[TETRO_T][1].x = 4;
-start_coords[TETRO_T][1].y = 16;
-start_coords[TETRO_T][2].x = 5;
-start_coords[TETRO_T][2].y = 16;
-start_coords[TETRO_T][3].x = 4;
-start_coords[TETRO_T][3].y = 15;
-
-start_coords[TETRO_Z][0].x = 3;
-start_coords[TETRO_Z][0].y = 16;
-start_coords[TETRO_Z][1].x = 4;
-start_coords[TETRO_Z][1].y = 16;
-start_coords[TETRO_Z][2].x = 4;
-start_coords[TETRO_Z][2].y = 15;
-start_coords[TETRO_Z][3].x = 5;
-start_coords[TETRO_Z][3].y = 15;
-*/
+} coord_t;
 
 #endif
