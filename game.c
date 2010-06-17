@@ -777,7 +777,7 @@ void g_onDownBlocked()
 			}
 		
 			SDL_Flip(screen);
-			SDL_Delay(150);
+			SDL_Delay(FLASH_INTERVAL);
 		}
 		printf("[g_onDownBlocked]: finished flashing\n");
 		
