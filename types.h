@@ -47,6 +47,9 @@
 #define SCREEN_HEIGHT 480
 #define BIT_DEPTH 32
 
+#define TARGET_FRAME_RATE 30
+#define ONE_SECOND 1000 //milliseconds
+
 #define COLORKEY_R 78
 #define COLORKEY_G 0
 #define COLORKEY_B 83

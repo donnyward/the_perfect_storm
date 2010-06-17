@@ -91,8 +91,6 @@ coord_t stasisCoord[] =
 	{ {0, 1, 1, 2}, {0, 0, 1, 1} }
 };
 
-int frame = 0;
-
 int g_getScore()
 {
 	return game.score;
@@ -281,9 +279,15 @@ void debug_msg(char * msg)
 
 void g_loop()
 {
-	//return; //until the loop is no longer infinite
+	int frame = 0;
+	int startTime;
+	int endTime;
+	
+	
+	
 	while ( !game.exitGameYet )
 	{
+		startTime = SDL_GetTicks();
 		//get time passed since last loop and see if enough time has passed for another update (target = 30 fps)
 		//take note of the current time (for next loop around)
 		
@@ -296,8 +300,14 @@ void g_loop()
 		
 		//update the display with latest updated data clear the screen and redraw everything
 		g_drawGame();
-//		SDL_Delay(1000);
-//		printf("gamestate = %d\n", game.state);
+		frame++;
+		//printf("frame %d\n", frame);
+		
+		endTime = SDL_GetTicks() - startTime;
+		
+		if ( endTime < (ONE_SECOND / TARGET_FRAME_RATE) )
+			SDL_Delay( (ONE_SECOND / TARGET_FRAME_RATE) - endTime );
+			
 	}
 	g_end(); //exit to dos
 }
@@ -449,15 +459,7 @@ void g_updateGame()
 		//do nothing
 	}
 	else if (game.state == STATE_MENU)
-	{
-		if (DEBUG_MODE)
-		{
-			frame++;
-			if (frame == 61)
-				frame = 1;
-			printf("[g_updateGame]: FRAME = %d\n", frame);
-		}
-		
+	{	
 		if ( !m_move() )
 		{
 			//too much output
@@ -530,10 +532,6 @@ void g_updateGame()
 	}
 	
 	menu.nextMoveDir = DIR_NONE;
-	//clear tetromino move values for next frame
-//	game.current->nextMoveX = DIR_NONE;
-//	game.current->nextMoveY = DIR_NONE;
-//	game.current->nextMoveDir = DIR_NONE;
 }
 
 void g_getImageCoords(short i, short j, short * x, short * y)
@@ -553,14 +551,6 @@ void g_drawGame()
 		//draw the background followed by the buttons.
 		//the 'selected' button will have a highlight drawn over it
 		
-		/*
-		image = g_loadImage("./pictures/menubackground.bmp");
-		
-		if (image == NULL)
-			printf("[g_drawGame]: error loading an image!\n");
-			
-		g_addSurface(0, 0, image, screen);
-		*/
 		switch (menu.menuLoc)
 		{
 			case M_MAIN:
@@ -841,12 +831,6 @@ boolean g_checkFullRow(int row)
 
 void g_dropAboveBlocksDown(int startRow, int count)
 {
-/*
-currently a bug exists in the logic. right now it starts at the first row above the bottommost
-full row (which is now empty),
-and goes from that row to the top, moving every block it comes across down a number equal to count.
-what must be done however is each row moves down a number equal to the number of rows that were cleared below it
-*/
 	//start from bottom most row and go up
 	int i, j;
 	int currentRow, column;
