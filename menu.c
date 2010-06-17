@@ -6,13 +6,6 @@ extern gameModule game;
 
 boolean m_move()
 {
-	/*
-	M_MAIN, //has newgame, highscores, and exit
-	M_HIGHSCORES, //has just high scores, escape will go back to main menu
-	M_PAUSE, //has continue, and quit
-	M_PAUSECONFIRMQUIT, //if quit is selected in pause menu, this will pop up asking yes or no (to confirm)
-	M_EXIT, //if exit is selected in main menu, this pops up asking yes or no (to confirm)
-	*/
 	if (menu.nextMoveDir == DIR_NONE)
 		return false;
 		

@@ -118,7 +118,7 @@ boolean tetro_setType(tetromino * t, tetroShape_t type);
 //returns the type of a tetromino
 tetroShape_t tetro_getType(tetromino * t);
 
-//returns the upper and lower bounding rows of the tetromino, via reference
+//returns the row of the highest block(s) on the tetromino as well as the row of its lowest block(s) by reference
 void tetro_getRows(tetromino * t, int * upper, int * lower);
 
 #endif

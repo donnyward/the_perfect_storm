@@ -80,16 +80,16 @@ coord_t rotation_L[] =
 coord_t rotation_O[] = 
 {
 	//0th rotation coords
-	{ {-1, 0, 1, 2}, {0, 0, 0, 0} },
+	{ {0,1,0,1}, {0,0,-1,-1} },
 	
 	//1th rotation
-	{ {0, 0, 0, 0}, {1, 0, -1, -2} },
+	{ {0,1,0,1}, {0,0,-1,-1} },
 	
 	//2nd rotation
-	{ {1, 0, -1, -2}, {0, 0, 0, 0} },
+	{ {0,1,0,1}, {0,0,-1,-1} },
 	
 	//3rd rotation
-	{ {0, 0, 0, 0}, {-1, 0, 1, 2} }
+	{ {0,1,0,1}, {0,0,-1,-1} }
 };
 */
 coord_t rotation_S[] = 
@@ -355,11 +355,10 @@ tetromino * tetro_create(tetroShape_t type)
 	{
 		//random number from 0 to 6
 		random = (rand()/(RAND_MAX+1.0)) * (TETRO_SHAPES-1);
-		//random = (int)((rand()/(RAND_MAX +1.0))*11);
 		printf("[tetro_create]: random number = %d\n", random);
 		type = random;
 		
-		type = TETRO_Z;
+	//	type = TETRO_S;
 	}
 	
 	if ( !tetro_setType(t, type) )
@@ -454,7 +453,7 @@ boolean tetro_move(tetromino * t, dir_t dir)
 			if ( tetro_move(t, dY) )
 				return true;
 			else
-				return false; //so we can repot g_onDownBlocked()
+				return false; //so we can report g_onDownBlocked()
 		}
 		return false;
 	}
@@ -490,7 +489,6 @@ moving down:
 	rotation 2 = 0-3
 	rotation 3 = 0-3
 */
-
 	switch (dir)
 	{
 		case DIR_WEST:
@@ -536,10 +534,7 @@ moving down:
 		for ( i = 0; i < TETRO_SIZE; i++ )
 		{
 			b = t->children[i];
-			//x = start_coords[type][i][x][y];
-			//block_teleport(b, 
-			//x = block_getLocX(b);
-			//y = block_getLocY(b);
+
 			if ( !block_move(b, dir) )
 			{
 				//go back and unmove all the previous blocks
@@ -558,10 +553,7 @@ moving down:
 		for ( i = TETRO_SIZE-1; i >= 0; i-- )
 		{
 			b = t->children[i];
-			//x = start_coords[type][i][x][y];
-			//block_teleport(b, 
-			//x = block_getLocX(b);
-			//y = block_getLocY(b);
+
 			if ( !block_move(b, dir) )
 			{
 				//go back and unmove all the previous blocks
@@ -596,10 +588,6 @@ boolean tetro_moveToStart(tetromino * t)
 	for ( i = 0; i < TETRO_SIZE; i++ )
 	{
 		b = t->children[i];
-		//try writing the data to a binary file?
-//		x = start_coords[type][i].x;
-//		y = start_coords[type][i].y;
-		
 		x = startCoord[type].xCoord[i];
 		y = startCoord[type].yCoord[i];
 		
@@ -682,120 +670,7 @@ boolean tetro_rotate(tetromino * t)
 		if (b != NULL && b != t->children[0] && b != t->children[1] && b != t->children[2] && b != t->children[3] )
 			doRotate = false;
 	}
-/*
-	switch (tetro_getType(t))
-	{
-		case TETRO_I:
-			for ( i = 0; i < TETRO_SIZE; i++ )
-			{
-				//offset from pivot + x/y coord of pivot
-				xDest[i] = rotation_I[rotationIndex].xCoord[i] + x;
-				yDest[i] = rotation_I[rotationIndex].yCoord[i] + y;
-		
-				printf("[tetro_rotate]: getting block at (%d, %d)\n", xDest[i], yDest[i]);
-				if ( g_isLocOutOfBounds(xDest[i], yDest[i]) )
-					doRotate = false;
-				else
-					b = g_getBlockAtPos(xDest[i], yDest[i]);
-				
-				if (b != NULL && b != pivot)
-					doRotate = false;
-			}
-			break;
-		case TETRO_J:
-			for ( i = 0; i < TETRO_SIZE; i++ )
-			{
-				//offset from pivot + x/y coord of pivot
-				xDest[i] = rotation_I[rotationIndex].xCoord[i] + x;
-				yDest[i] = rotation_I[rotationIndex].yCoord[i] + y;
-		
-				printf("[tetro_rotate]: getting block at (%d, %d)\n", xDest[i], yDest[i]);
-				if ( g_isLocOutOfBounds(xDest[i], yDest[i]) )
-					doRotate = false;
-				else
-					b = g_getBlockAtPos(xDest[i], yDest[i]);
-				
-				if (b != NULL && b != pivot)
-					doRotate = false;
-			}		
-			break;
-		case TETRO_L:
-			for ( i = 0; i < TETRO_SIZE; i++ )
-			{
-				//offset from pivot + x/y coord of pivot
-				xDest[i] = rotation_I[rotationIndex].xCoord[i] + x;
-				yDest[i] = rotation_I[rotationIndex].yCoord[i] + y;
-		
-				printf("[tetro_rotate]: getting block at (%d, %d)\n", xDest[i], yDest[i]);
-				if ( g_isLocOutOfBounds(xDest[i], yDest[i]) )
-					doRotate = false;
-				else
-					b = g_getBlockAtPos(xDest[i], yDest[i]);
-				
-				if (b != NULL && b != pivot)
-					doRotate = false;
-			}		
-			break;
-		case TETRO_O:
-			//looks the same every rotation
-			return true;
-			break;
-		case TETRO_S:
-			for ( i = 0; i < TETRO_SIZE; i++ )
-			{
-				//offset from pivot + x/y coord of pivot
-				xDest[i] = rotation_I[rotationIndex].xCoord[i] + x;
-				yDest[i] = rotation_I[rotationIndex].yCoord[i] + y;
-		
-				printf("[tetro_rotate]: getting block at (%d, %d)\n", xDest[i], yDest[i]);
-				if ( g_isLocOutOfBounds(xDest[i], yDest[i]) )
-					doRotate = false;
-				else
-					b = g_getBlockAtPos(xDest[i], yDest[i]);
-				
-				if (b != NULL && b != pivot)
-					doRotate = false;
-			}		
-			break;
-		case TETRO_T:
-			for ( i = 0; i < TETRO_SIZE; i++ )
-			{
-				//offset from pivot + x/y coord of pivot
-				xDest[i] = rotation_I[rotationIndex].xCoord[i] + x;
-				yDest[i] = rotation_I[rotationIndex].yCoord[i] + y;
-		
-				printf("[tetro_rotate]: getting block at (%d, %d)\n", xDest[i], yDest[i]);
-				if ( g_isLocOutOfBounds(xDest[i], yDest[i]) )
-					doRotate = false;
-				else
-					b = g_getBlockAtPos(xDest[i], yDest[i]);
-				
-				if (b != NULL && b != pivot)
-					doRotate = false;
-			}		
-			break;
-		case TETRO_Z:
-			for ( i = 0; i < TETRO_SIZE; i++ )
-			{
-				//offset from pivot + x/y coord of pivot
-				xDest[i] = rotation_I[rotationIndex].xCoord[i] + x;
-				yDest[i] = rotation_I[rotationIndex].yCoord[i] + y;
-		
-				printf("[tetro_rotate]: getting block at (%d, %d)\n", xDest[i], yDest[i]);
-				if ( g_isLocOutOfBounds(xDest[i], yDest[i]) )
-					doRotate = false;
-				else
-					b = g_getBlockAtPos(xDest[i], yDest[i]);
-				
-				if (b != NULL && b != pivot)
-					doRotate = false;
-			}		
-			break;
-		default:
-			doRotate = false;
-			break;
-	}
-	*/
+
 	if (doRotate)
 	{
 		//S, T, and Z need blocks moved in the correct order to rotate properly
@@ -907,19 +782,34 @@ tetroShape_t tetro_getType(tetromino * t)
 	return t->type;
 }
 
+//redone to account for rotated tetrominos
 void tetro_getRows(tetromino * t, int * upper, int * lower)
 {
-	int temp;
-
-	*upper = t->children[1]->y;
-	*lower = t->children[3]->y;
+	int x, y;
+	boolean first = true;
+	block * b;
 	
-	if (*lower > *upper)
+	//starting from bottom going up
+	for ( y = 0; y < SIZE_Y; y++ )
 	{
-		temp = *lower;
-		*lower = *upper;
-		*upper = temp;
+		for ( x = 0; x < SIZE_X; x++ )
+		{
+			b = g_getBlockAtPos(x, y);
+			
+			if (b != NULL)
+			{
+				if ( b == t->children[0] || b == t->children[1] || b == t->children[2] || b == t->children[3] )
+				{
+					if (first)
+					{
+						*lower = block_getLocY(b);
+						first = false;
+					}
+					else
+						*upper = block_getLocY(b);
+				}
+			}
+		}
 	}
-	return;
 }
 

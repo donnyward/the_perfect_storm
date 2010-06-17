@@ -12,6 +12,10 @@ SDL_Surface * image; //used by g_drawGame()
 extern menu_t menu; //needed in this file to set its values in g_handleInput()
 gameModule game; //game module, stores levle, 2d grid and what it contains, etc
 
+//keeps track of how many rows are filled below row [ ].
+//used to figure out how far to move down blocks when erasing lines
+int numRowsFilledBelow[SIZE_Y];
+
 dir_t clockwiseDir[] = 
 {
 	DIR_NORTHEAST,
@@ -175,6 +179,8 @@ void g_end()
 
 void g_create()
 {
+	int i;
+	
 	//set initial values for a gameModule new game
 	game.level = 1;
 	game.score = 0;
@@ -182,6 +188,9 @@ void g_create()
 	game.state = STATE_IDLE;
 	game.next = NULL;
 	game.current = NULL;
+	
+	for ( i = 0; i < SIZE_Y; i++ )
+		numRowsFilledBelow[i] = 0;
 
 	printf("Get Ready...\n");
 	
@@ -711,8 +720,8 @@ void g_clearGrid()
 
 void g_onDownBlocked()
 {
-	int rowTop = 0;
-	int rowBottom = 0;
+	int rowTop = -1;
+	int rowBottom = -1;
 	short i, j, k;
 	short x = -1, y = -1;
 	int count = 0;
@@ -822,6 +831,11 @@ boolean g_checkFullRow(int row)
 		if ( g_getBlockAtPos(i, row) == NULL )
 			return false;
 	}
+	
+	//row is full, increment counter for every row above this one
+	for ( i = row+1; i < SIZE_Y; i++ )
+		(numRowsFilledBelow[i])++;
+		
 	return true;
 }
 
@@ -845,7 +859,7 @@ what must be done however is each row moves down a number equal to the number of
 			b = g_getBlockAtPos(j, currentRow);
 			if ( b != NULL )
 			{
-				for ( i = 0; i < count; i++ )
+				for ( i = 0; i < numRowsFilledBelow[currentRow]; i++ )
 				{
 					if ( block_move(b, DIR_SOUTH) )
 					{
@@ -859,4 +873,7 @@ what must be done however is each row moves down a number equal to the number of
 			}
 		}
 	}
+	//reset array
+	for ( i = 0; i < SIZE_Y; i++ )
+		numRowsFilledBelow[i] = 0;
 }
