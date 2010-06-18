@@ -15,6 +15,7 @@ gameModule game; //game module, stores levle, 2d grid and what it contains, etc
 //keeps track of how many rows are filled below row [ ].
 //used to figure out how far to move down blocks when erasing lines
 int numRowsFilledBelow[SIZE_Y];
+int dropFrameInterval = 0;
 
 dir_t clockwiseDir[] = 
 {
@@ -89,6 +90,15 @@ coord_t stasisCoord[] =
 
 	//Z SHAPE
 	{ {0, 1, 1, 2}, {0, 0, 1, 1} }
+};
+
+int dropIntervalPerRow[] = 
+{
+	53, 49, 45, 41, 37,
+	33, 28, 22, 17, 11,
+	10, 9, 8, 7, 6,
+	6, 5, 5, 4, 4,
+	3
 };
 
 int g_getScore()
@@ -180,12 +190,13 @@ void g_create()
 	int i;
 	
 	//set initial values for a gameModule new game
-	game.level = 1;
+	game.level = 0;
 	game.score = 0;
 	game.lines = 0;
 	game.state = STATE_IDLE;
 	game.next = NULL;
 	game.current = NULL;
+	game.currentTime = 0;
 	
 	for ( i = 0; i < SIZE_Y; i++ )
 		numRowsFilledBelow[i] = 0;
@@ -199,6 +210,7 @@ void g_create()
 	printf("GO GO GO\n");
 	tetro_moveToStart(game.current);
 	game.state = STATE_PLAYING;
+	game.lastDropTime = SDL_GetTicks();
 }
 
 SDL_Surface * g_loadImage(char * filename)
@@ -470,14 +482,26 @@ void g_updateGame()
 	{	
 		//take note of the time here, see if it is time to move the current tetro
 		//1 notch down
-		/*
-		if ( !tetro_move(game.current, DIR_SOUTH) ) //the periodic drop down was blocked
+		game.currentTime = SDL_GetTicks();
+		
+		if ( dropFrameInterval >= dropIntervalPerRow[game.level] )
 		{
-			printf("[g_updateGame]: periodic drop down blocked!\n");
-			g_onDownBlocked();
+			dropFrameInterval = 0;
+
+			if ( !tetro_move(game.current, DIR_SOUTH) ) //the periodic drop down was blocked
+			{
+				printf("[g_updateGame]: periodic drop down blocked!\n");
+				g_onDownBlocked();
+				
+				if ( game.level*10 <= game.lines )
+				{
+					game.level++;
+					game.dropInterval -= 0.1;
+				}
+			}
+			game.lastDropTime = game.currentTime;
 		}
-			
-		*/
+		
 			
 		//rotate has priority
 		if ( game.current->tryRotate )
@@ -525,6 +549,9 @@ void g_updateGame()
 		game.current->nextMoveY = DIR_NONE;
 		game.current->nextMoveDir = DIR_NONE;
 		game.current->tryRotate = false;
+		
+
+		dropFrameInterval++;
 	}
 	else
 	{
@@ -745,12 +772,29 @@ void g_onDownBlocked()
 			printf("[g_onDownBlocked]: full row at %d!\n", i);
 			fullRows[count] = i;
 			count++;
+			game.lines++;
 		}
 		else
 			printf("[g_onDownBlocked]: no full row at %d!\n", i);
 	}
 	
 	printf("[g_onDownBlocked]: number of rows filled = %d\n", count);
+	
+	switch (count)
+	{
+		case 1:
+			game.score += SCORE_MODIFIER_ONE_LINES * (game.level+1);
+			break;
+		case 2:
+			game.score += SCORE_MODIFIER_TWO_LINES * (game.level+1);
+			break;
+		case 3:
+			game.score += SCORE_MODIFIER_THREE_LINES * (game.level+1);
+			break;
+		case 4:
+			game.score += SCORE_MODIFIER_FOUR_LINES * (game.level+1);
+			break;
+	}
 	
 	//full line(s) exist, flash them then remove, then drop above blocks down
 	if ( count > 0 )

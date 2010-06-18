@@ -27,6 +27,10 @@ typedef struct gameModule
 	tetromino * next;
 	tetromino * current;
 	block * pos[SIZE_X][SIZE_Y];
+	
+	int lastDropTime;
+	int currentTime;
+	float dropInterval; //how often to make block drop down automatically
 } gameModule;
 
 //===============================================

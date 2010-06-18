@@ -1,0 +1,23 @@
+each number shall b 20x20 pixels
+
+
+score
+y coord = 108
+6th digit's x coord = 20
+5th digit's x coord = 40
+4th digit's x coord = 60
+3rd digit's x coord = 80
+2nd digit's x coord = 100
+1st digit's x coord = 120
+
+level
+y coord = 250
+2nd digit's x coord = 80
+1st digit's x coord = 100
+
+lines
+y coord = 392
+3rd digit's x coord = 60
+2nd digit's x coord = 80
+1st digit's x coord = 100
+

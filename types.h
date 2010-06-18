@@ -40,6 +40,9 @@
 
 #define NIL 0
 
+#define MAX_LEVELS 20
+
+
 //===============================================
 //Video settings
 //===============================================
@@ -47,7 +50,7 @@
 #define SCREEN_HEIGHT 480
 #define BIT_DEPTH 32
 
-#define TARGET_FRAME_RATE 30
+#define TARGET_FRAME_RATE 60
 #define ONE_SECOND 1000 //milliseconds
 
 #define COLORKEY_R 78
@@ -57,6 +60,13 @@
 #define FLASH_FRAMES 8 //even number = last flash frame before disappear is "normal" unflashed block
 #define FLASH_INTERVAL 150
 
+//===============================================
+//Scoring
+//===============================================
+#define SCORE_MODIFIER_ONE_LINES 40
+#define SCORE_MODIFIER_TWO_LINES 100
+#define SCORE_MODIFIER_THREE_LINES 300
+#define SCORE_MODIFIER_FOUR_LINES 1200
 //boolean type, accepts true or false
 typedef enum
 {
