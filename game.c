@@ -101,6 +101,51 @@ int dropIntervalPerRow[] =
 	3
 };
 
+char numIcon0[] = "./pictures/NUM0.BMP";
+char numIcon1[] = "./pictures/NUM1.BMP";
+char numIcon2[] = "./pictures/NUM2.BMP";
+char numIcon3[] = "./pictures/NUM3.BMP";
+char numIcon4[] = "./pictures/NUM4.BMP";
+char numIcon5[] = "./pictures/NUM5.BMP";
+char numIcon6[] = "./pictures/NUM6.BMP";
+char numIcon7[] = "./pictures/NUM7.BMP";
+char numIcon8[] = "./pictures/NUM8.BMP";
+char numIcon9[] = "./pictures/NUM9.BMP";
+
+char blockIconI[] = "./pictures/BLOCK_I.bmp";
+char blockIconJ[] = "./pictures/BLOCK_J.bmp";
+char blockIconL[] = "./pictures/BLOCK_L.bmp";
+char blockIconO[] = "./pictures/BLOCK_O.bmp";
+char blockIconS[] = "./pictures/BLOCK_S.bmp";
+char blockIconT[] = "./pictures/BLOCK_T.bmp";
+char blockIconZ[] = "./pictures/BLOCK_Z.bmp";
+
+char * numIcon[] = 
+{
+	numIcon0,
+	numIcon1,
+	numIcon2,
+	numIcon3,
+	numIcon4,
+	numIcon5,
+	numIcon6,
+	numIcon7,
+	numIcon8,
+	numIcon9
+};
+
+char * blockIcon[] = 
+{
+	blockIconI,
+	blockIconJ,
+	blockIconL,
+	blockIconO,
+	blockIconS,
+	blockIconT,
+	blockIconZ,
+	NULL //TETRO_RANDOM
+};
+
 int g_getScore()
 {
 	return game.score;
@@ -191,7 +236,7 @@ void g_create()
 	
 	//set initial values for a gameModule new game
 	game.level = 0;
-	game.score = 0;
+	game.score = 13;
 	game.lines = 0;
 	game.state = STATE_IDLE;
 	game.next = NULL;
@@ -237,30 +282,9 @@ SDL_Surface * g_loadImage(char * filename)
 SDL_Surface * g_loadBlockImage(tetroShape_t type)
 {
 	SDL_Surface * image;
-	switch (type)
-	{
-		case TETRO_I:
-			image = g_loadImage("./pictures/BLOCK_I.bmp");
-			break;
-		case TETRO_J:
-			image = g_loadImage("./pictures/BLOCK_J.bmp");
-			break;
-		case TETRO_L:
-			image = g_loadImage("./pictures/BLOCK_L.bmp");
-			break;
-		case TETRO_O:
-			image = g_loadImage("./pictures/BLOCK_O.bmp");
-			break;
-		case TETRO_S:
-			image = g_loadImage("./pictures/BLOCK_S.bmp");
-			break;
-		case TETRO_T:
-			image = g_loadImage("./pictures/BLOCK_T.bmp");
-			break;
-		case TETRO_Z:
-			image = g_loadImage("./pictures/BLOCK_Z.bmp");
-			break;
-	}
+	
+	image = g_loadImage(blockIcon[type]);
+	
 	return image;
 }
 
@@ -572,6 +596,8 @@ void g_drawGame()
 	SDL_Surface * image = NULL;
 	short i, j, x, y;
 	block * b = NULL;
+	int quotient;
+	short modifier, count;
 	
 	if (game.state == STATE_MENU)
 	{
@@ -640,7 +666,66 @@ void g_drawGame()
 		g_addSurface(0, 0, image, screen);
 		
 		
-		//score, level, lines here
+		//SCORE
+		modifier = 1;
+		count = 0;
+		quotient = game.score / modifier;
+		
+		while (quotient > 0 && count < 6) //stops after score runs out of digits or 6 digits are drawn
+		{
+			i = (game.score / modifier) % 10;
+			image = g_loadImage(numIcon[i]);
+			g_addSurface(SCORE_FIRST_DIGIT_X-(NUMBER_LENGTH*count), SCORE_IMAGE_Y, image, screen);
+			
+			count++;
+			modifier *= 10;
+			quotient = game.score / modifier;
+		}
+
+		//LEVEL
+		modifier = 1;
+		count = 0;
+		quotient = game.level / modifier;
+		
+		if ( game.level == 0 )
+		{
+			image = g_loadImage(numIcon[0]);
+			g_addSurface(LEVEL_FIRST_DIGIT_X, LEVEL_IMAGE_Y, image, screen);
+		}
+		
+		while (quotient > 0 && count < 2) //stops after level runs out of digits or 6 digits are drawn
+		{
+			i = (game.level / modifier) % 10;
+			image = g_loadImage(numIcon[i]);
+			g_addSurface(LEVEL_FIRST_DIGIT_X-(NUMBER_LENGTH*count), LEVEL_IMAGE_Y, image, screen);
+			
+			count++;
+			modifier *= 10;
+			quotient = game.level / modifier;
+		}
+		
+		
+		//LINES
+		modifier = 1;
+		count = 0;
+		quotient = game.lines / modifier;
+		
+		if ( game.lines == 0 )
+		{
+			image = g_loadImage(numIcon[0]);
+			g_addSurface(LINES_FIRST_DIGIT_X, LINES_IMAGE_Y, image, screen);
+		}
+		
+		while (quotient > 0 && count < 2) //stops after score runs out of digits or 6 digits are drawn
+		{
+			i = (game.lines / modifier) % 10;
+			image = g_loadImage(numIcon[i]);
+			g_addSurface(LINES_FIRST_DIGIT_X-(NUMBER_LENGTH*count), LINES_IMAGE_Y, image, screen);
+			
+			count++;
+			modifier *= 10;
+			quotient = game.lines / modifier;
+		}
 		
 		//draw next block in the box
 		for ( i = 0; i < TETRO_SIZE; i++ )

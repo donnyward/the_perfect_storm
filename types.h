@@ -60,6 +60,16 @@
 #define FLASH_FRAMES 8 //even number = last flash frame before disappear is "normal" unflashed block
 #define FLASH_INTERVAL 150
 
+#define NUMBER_LENGTH 20 //pixels
+
+#define SCORE_IMAGE_Y 108
+#define LINES_IMAGE_Y 392
+#define LEVEL_IMAGE_Y 250
+
+//the rightmost digit. the next digit is this number - 20
+#define LEVEL_FIRST_DIGIT_X 100
+#define LINES_FIRST_DIGIT_X 100
+#define SCORE_FIRST_DIGIT_X 120
 //===============================================
 //Scoring
 //===============================================
