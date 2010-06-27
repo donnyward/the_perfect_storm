@@ -11,6 +11,7 @@ extern SDL_Surface * screen; //the screen surface. originally declared in main.c
 SDL_Surface * image; //used by g_drawGame()
 extern menu_t menu; //needed in this file to set its values in g_handleInput()
 gameModule game; //game module, stores levle, 2d grid and what it contains, etc
+extern highScoresStruct highScores;
 
 //keeps track of how many rows are filled below row [ ].
 //used to figure out how far to move down blocks when erasing lines
@@ -693,6 +694,10 @@ void g_drawGame()
 				g_addSurface(buttonLocX[S_EXIT], buttonLocY[S_EXIT], image, screen);
 				break;
 			case M_HIGHSCORES:
+				image = g_loadImage("./pictures/splash.bmp");
+				g_addSurface(0, 0, image, screen);
+				
+				
 				break;
 			case M_PAUSE:
 				image = g_loadImage("./pictures/menupaused.bmp");
@@ -725,8 +730,12 @@ void g_drawGame()
 				printf("[g_drawGame]: weird menu.menuLoc!\n");
 				break;
 		}
-		image = g_loadImage("./pictures/BORDER_GREEN.bmp");
-		g_addSurface(buttonLocX[menu.currentSelection], buttonLocY[menu.currentSelection], image, screen);
+		//no selection border for high scores screen
+		if ( menu.menuLoc != M_HIGHSCORES )
+		{
+			image = g_loadImage("./pictures/BORDER_GREEN.bmp");
+			g_addSurface(buttonLocX[menu.currentSelection], buttonLocY[menu.currentSelection], image, screen);
+		}
 	}
 	else if (game.state == STATE_PLAYING)
 	{
@@ -1029,7 +1038,7 @@ void g_onDownBlocked()
 	if ( !tetro_moveToStart(game.current) )
 	{
 		printf("[g_onDownBlocked]: GAME OVER!\n");
-		game.state = STATE_IDLE;
+		g_clear(REASON_LOSS);
 	}
 }
 

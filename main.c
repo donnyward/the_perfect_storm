@@ -4,6 +4,9 @@
 
 
 SDL_Surface * screen;
+highScoresStruct highScores;
+
+void checkHighScores();
 
 int main(int argc, char * argv[])
 {
@@ -45,6 +48,9 @@ int main(int argc, char * argv[])
 	//set some initial values for the gameModule
 	g_init();
 	
+	//checks for high scores list and creates default one if none found
+	checkHighScores();
+	
 //	SDL_Delay(2000); //wait, to see image for a bit
 
 
@@ -53,4 +59,52 @@ int main(int argc, char * argv[])
 	return 0;
 }
 
+void checkHighScores()
+{
+	highScoresStruct data;
+	FILE * f;
+	
+	f = fopen("hs.dat", "rb");
+	
+	if (f != NULL)
+	{
+		printf("[checkHighScores]: hs.dat already exists!\n");
+		
+		fread(&highScores, sizeof(highScoresStruct), 1, f);
 
+	}
+	else
+	{
+		printf("[checkHighScores]: creating new hs.dat... \n");
+		f = fopen("hs.dat", "wb");
+		
+		strcpy(data.name0, "KKD");
+		strcpy(data.name1, "JFK");
+		strcpy(data.name2, "ERL");
+		strcpy(data.name3, "BEN");
+		strcpy(data.name4, "JON");
+		strcpy(data.name5, "AJW");
+		strcpy(data.name6, "TIM");
+		strcpy(data.name7, "PAL");
+		strcpy(data.name8, "MIK");
+		strcpy(data.name9, "KIM");
+	
+		data.scores[0] = HIGH_SCORES_0;
+		data.scores[1] = HIGH_SCORES_1;
+		data.scores[2] = HIGH_SCORES_2;
+		data.scores[3] = HIGH_SCORES_3;
+		data.scores[4] = HIGH_SCORES_4;
+		data.scores[5] = HIGH_SCORES_5;
+		data.scores[6] = HIGH_SCORES_6;
+		data.scores[7] = HIGH_SCORES_7;
+		data.scores[8] = HIGH_SCORES_8;
+		data.scores[9] = HIGH_SCORES_9;
+	
+		fwrite(&data, sizeof(highScoresStruct), 1, f);
+		
+		highScores = data;
+	}
+	
+	fclose(f);
+	printf("highScores.scores[2] = %d\n", highScores.scores[2]);
+}

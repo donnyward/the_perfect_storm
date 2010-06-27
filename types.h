@@ -83,6 +83,20 @@
 #define SCORE_MODIFIER_THREE_LINES 300
 #define SCORE_MODIFIER_FOUR_LINES 1200
 
+//high scores list
+#define HIGH_SCORES_LIST_SIZE 10
+#define HIGH_SCORES_0 500000
+#define HIGH_SCORES_1 400000
+#define HIGH_SCORES_2 350000
+#define HIGH_SCORES_3 325000
+#define HIGH_SCORES_4 300000
+#define HIGH_SCORES_5 200000
+#define HIGH_SCORES_6 150000
+#define HIGH_SCORES_7 100000
+#define HIGH_SCORES_8 50000
+#define HIGH_SCORES_9 10000
+#define INITIALS_SIZE 4 //last is null termin8er
+
 //boolean type, accepts true or false
 typedef enum
 {
@@ -140,5 +154,21 @@ typedef struct
 	short xCoord[TETRO_SIZE];
 	short yCoord[TETRO_SIZE];
 } coord_t;
+
+typedef struct
+{
+	int scores[HIGH_SCORES_LIST_SIZE];
+	//char * names[HIGH_SCORES_LIST_SIZE];
+	char name0[INITIALS_SIZE];
+	char name1[INITIALS_SIZE];
+	char name2[INITIALS_SIZE];
+	char name3[INITIALS_SIZE];
+	char name4[INITIALS_SIZE];
+	char name5[INITIALS_SIZE];
+	char name6[INITIALS_SIZE];
+	char name7[INITIALS_SIZE];
+	char name8[INITIALS_SIZE];
+	char name9[INITIALS_SIZE];
+} highScoresStruct;
 
 #endif

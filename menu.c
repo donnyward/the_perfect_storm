@@ -85,6 +85,7 @@ boolean m_move()
 		else if (menu.currentSelection == S_HIGHSCORES)
 		{
 			//open up high scores screen
+			m_highScores(REASON_CHOSEN);
 		}
 		else if (menu.currentSelection == S_EXIT)
 		{
@@ -176,6 +177,8 @@ boolean m_move()
 
 boolean m_highScores(highScoresReason_t r)
 {
+	menu.menuLoc = M_HIGHSCORES;
+	return true;
 }
 
 void m_init()
