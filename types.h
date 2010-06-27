@@ -44,6 +44,8 @@
 #define MAX_SCORE 999999
 
 #define SOFT_DROP_FRAMES 3 //how many frames for a block to soft drop by 1 cell
+#define DAS_DELAY 11 //number of frames to wait for delayed auto shifting
+#define DAS_PERIOD 5 //how often to move one notch while DAS'ing
 
 //===============================================
 //Video settings

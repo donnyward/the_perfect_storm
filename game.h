@@ -39,6 +39,11 @@ typedef struct gameModule
 	int softDropFrame;
 	boolean isSoftDropping;
 	int softDropDistanceCount;
+	
+	//for delayed auto shifting (left and right)
+	dir_t dasDir;
+	int dasFrame;
+	boolean dasDelaying;
 } gameModule;
 
 //===============================================

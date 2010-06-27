@@ -236,7 +236,7 @@ void g_create()
 	
 	//set initial values for a gameModule new game
 	game.level = 0;
-	game.score = 13;
+	game.score = 0;
 	game.lines = 0;
 	game.state = STATE_IDLE;
 	game.next = NULL;
@@ -256,6 +256,10 @@ void g_create()
 	tetro_moveToStart(game.current);
 	game.state = STATE_PLAYING;
 	//game.lastDropTime = SDL_GetTicks();
+	
+	game.isSoftDropping = false;
+	game.dasDir = DIR_NONE;
+	game.dasDelaying = true;
 }
 
 SDL_Surface * g_loadImage(char * filename)
@@ -318,9 +322,7 @@ void g_loop()
 	int frame = 0;
 	int startTime;
 	int endTime;
-	
-	
-	
+
 	while ( !game.exitGameYet )
 	{
 		startTime = SDL_GetTicks();
@@ -433,21 +435,41 @@ void g_handleInput()
 							}
 							break;
 						case SDLK_LEFT:
-							if (game.current->nextMoveX == DIR_NONE)
-								game.current->nextMoveX = DIR_WEST;
-							else if (game.current->nextMoveX == DIR_EAST)
+							if ( game.dasDir == DIR_NONE )
 							{
-								//cancel out opposite inputs
-								game.current->nextMoveY == DIR_NONE;
+								if (game.current->nextMoveX == DIR_NONE)
+									game.current->nextMoveX = DIR_WEST;
+								else if (game.current->nextMoveX == DIR_EAST)
+								{
+									//cancel out opposite inputs
+									game.current->nextMoveY == DIR_NONE;
+								}
+								game.dasDir = DIR_WEST;
+								game.dasFrame = 0;
+								game.dasDelaying = true;
+							}
+							else if ( game.dasDir == DIR_EAST ) //cancel das
+							{
+								game.dasDir = DIR_NONE;
 							}
 							break;
 						case SDLK_RIGHT:
-							if (game.current->nextMoveX == DIR_NONE)
-								game.current->nextMoveX = DIR_EAST;
-							else if (game.current->nextMoveX == DIR_WEST)
+							if ( game.dasDir == DIR_NONE )
 							{
-								//cancel out opposite inputs
-								game.current->nextMoveY == DIR_NONE;
+								if (game.current->nextMoveX == DIR_NONE)
+									game.current->nextMoveX = DIR_EAST;
+								else if (game.current->nextMoveX == DIR_WEST)
+								{
+									//cancel out opposite inputs
+									game.current->nextMoveY == DIR_NONE;
+								}
+								game.dasDir = DIR_EAST;
+								game.dasFrame = 0;
+								game.dasDelaying = true;
+							}
+							else if ( game.dasDir == DIR_WEST ) //cancel das
+							{
+								game.dasDir = DIR_NONE;
 							}
 							break;
 						case SDLK_ESCAPE: //(bring up pause menu, or go back thru any menu that your in.)
@@ -470,11 +492,20 @@ void g_handleInput()
 					case SDLK_DOWN:
 						game.softDropFrame = 0;
 						game.isSoftDropping = false;
-						dropFrameInterval = 0; //so block doesnt autodrop right away
+						dropFrameInterval = dropIntervalPerRow[game.level] / 2; //dont want block to autodrop riiiiight away
 						break;
 					case SDLK_LEFT:
+						if ( game.dasDir == DIR_WEST )
+						{
+							game.dasDir = DIR_NONE;
+						}
+						break;
 					case SDLK_RIGHT:
-
+						if ( game.dasDir == DIR_EAST )
+						{
+							game.dasDir = DIR_NONE;
+						}
+						break;
 					default:
 						break;
 				}
@@ -525,12 +556,6 @@ void g_updateGame()
 			{
 				printf("[g_updateGame]: periodic drop down blocked!\n");
 				g_onDownBlocked();
-				
-				if ( game.level*10 <= game.lines )
-				{
-					game.level++;
-					//game.dropInterval -= 0.1;
-				}
 			}
 			//game.lastDropTime = game.currentTime;
 		}
@@ -546,6 +571,31 @@ void g_updateGame()
 			else
 				printf("[g_updateGame]: rotate failed!\n");
 		}
+		
+		//for delayed auto shifting
+		if ( game.dasDir != DIR_NONE )
+		{
+			game.current->nextMoveY = DIR_NONE;
+			if ( game.dasDelaying )
+			{
+				if ( game.dasFrame >= DAS_DELAY )
+				{
+					game.dasDelaying = false;
+					game.current->nextMoveX = game.dasDir;
+					game.dasFrame = 0;
+				}
+			}
+			else
+			{
+				if ( game.dasFrame >= DAS_PERIOD )
+				{
+					game.current->nextMoveX = game.dasDir;
+					game.dasFrame = 0;
+				}
+			}
+			game.dasFrame++;
+		}
+		//printf("game.dasFrame = %d\n", game.dasFrame);
 		
 		if ( game.isSoftDropping )
 		{
@@ -589,7 +639,7 @@ void g_updateGame()
 			//attempt to move tetro in this direction
 			if ( !tetro_move(game.current, game.current->nextMoveDir) )
 			{
-				printf("[g_updateGame]: tetro_move failed!\n");
+				//printf("[g_updateGame]: tetro_move failed!\n");
 				if ( game.current->nextMoveDir == DIR_SOUTH  || game.current->nextMoveDir == DIR_SOUTHWEST || game.current->nextMoveDir == DIR_SOUTHEAST )
 				{
 					g_onDownBlocked();
@@ -597,22 +647,15 @@ void g_updateGame()
 			}
 		}
 		
-		
-
-		
-		
 		game.current->nextMoveX = DIR_NONE;
 		game.current->nextMoveY = DIR_NONE;
 		game.current->nextMoveDir = DIR_NONE;
 		game.current->tryRotate = false;
-		
 
 		dropFrameInterval++;
 	}
 	else
-	{
 		printf("[g_updateGame]: unknown game.state!\n");
-	}
 	
 	menu.nextMoveDir = DIR_NONE;
 }
@@ -702,6 +745,12 @@ void g_drawGame()
 		modifier = 1;
 		count = 0;
 		quotient = game.score / modifier;
+		
+		if ( game.score == 0 )
+		{
+			image = g_loadImage(numIcon[0]);
+			g_addSurface(SCORE_FIRST_DIGIT_X, SCORE_IMAGE_Y, image, screen);
+		}
 		
 		while (quotient > 0 && count < 6) //stops after score runs out of digits or 6 digits are drawn
 		{
@@ -915,6 +964,15 @@ void g_onDownBlocked()
 			game.score += SCORE_MODIFIER_FOUR_LINES * (game.level+1);
 			break;
 	}
+	
+	//calculate level here
+	/*
+	if ( game.level*10 <= game.lines )
+	{
+		game.level++;
+	}
+	*/
+	game.level = game.lines/10;
 	
 	//full line(s) exist, flash them then remove, then drop above blocks down
 	if ( count > 0 )
