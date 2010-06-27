@@ -241,7 +241,7 @@ void g_create()
 	game.state = STATE_IDLE;
 	game.next = NULL;
 	game.current = NULL;
-	game.currentTime = 0;
+	//game.currentTime = 0;
 	
 	for ( i = 0; i < SIZE_Y; i++ )
 		numRowsFilledBelow[i] = 0;
@@ -255,7 +255,7 @@ void g_create()
 	printf("GO GO GO\n");
 	tetro_moveToStart(game.current);
 	game.state = STATE_PLAYING;
-	game.lastDropTime = SDL_GetTicks();
+	//game.lastDropTime = SDL_GetTicks();
 }
 
 SDL_Surface * g_loadImage(char * filename)
@@ -408,6 +408,7 @@ void g_handleInput()
 					switch (event.key.keysym.sym) //figure out what key
 					{
 						case SDLK_DOWN:
+							/*
 							if (game.current->nextMoveY == DIR_NONE)
 								game.current->nextMoveY = DIR_SOUTH;
 							else if (game.current->nextMoveY == DIR_NORTH)
@@ -415,6 +416,10 @@ void g_handleInput()
 								//cancel out opposite inputs
 								game.current->nextMoveY == DIR_NONE;
 							}
+							*/
+							game.softDropFrame = SOFT_DROP_FRAMES;
+							game.isSoftDropping = true;
+							game.softDropDistanceCount = 0;
 							break;
 						case SDLK_UP:
 							if (!DEBUG_MODE)
@@ -463,6 +468,10 @@ void g_handleInput()
 				switch (event.key.keysym.sym) //figure out what key
 				{
 					case SDLK_DOWN:
+						game.softDropFrame = 0;
+						game.isSoftDropping = false;
+						dropFrameInterval = 0; //so block doesnt autodrop right away
+						break;
 					case SDLK_LEFT:
 					case SDLK_RIGHT:
 
@@ -504,11 +513,11 @@ void g_updateGame()
 	}
 	else if (game.state == STATE_PLAYING)
 	{	
-		//take note of the time here, see if it is time to move the current tetro
-		//1 notch down
-		game.currentTime = SDL_GetTicks();
+		//game.currentTime = SDL_GetTicks();
 		
-		if ( dropFrameInterval >= dropIntervalPerRow[game.level] )
+		//take note of the frame here, see if it is time to move the current tetro
+		//1 notch down
+		if ( dropFrameInterval >= dropIntervalPerRow[game.level] && !game.isSoftDropping ) //time to drop down 1, only if down arrow not already held down
 		{
 			dropFrameInterval = 0;
 
@@ -520,11 +529,12 @@ void g_updateGame()
 				if ( game.level*10 <= game.lines )
 				{
 					game.level++;
-					game.dropInterval -= 0.1;
+					//game.dropInterval -= 0.1;
 				}
 			}
-			game.lastDropTime = game.currentTime;
+			//game.lastDropTime = game.currentTime;
 		}
+		
 		
 			
 		//rotate has priority
@@ -535,6 +545,24 @@ void g_updateGame()
 				printf("[g_updateGame]: rotate success!\n");
 			else
 				printf("[g_updateGame]: rotate failed!\n");
+		}
+		
+		if ( game.isSoftDropping )
+		{
+			if ( game.softDropFrame >= SOFT_DROP_FRAMES ) //time to move down a notch
+			{
+				game.softDropFrame = 0;
+				if ( !tetro_move(game.current, DIR_SOUTH) )
+				{
+					//printf("[g_updateGame]: periodic drop down blocked!\n");
+					g_onDownBlocked();
+					game.softDropFrame = SOFT_DROP_FRAMES; //next block insta drop down
+					game.score += game.softDropDistanceCount;
+				}
+				else
+					game.softDropDistanceCount++;
+			}
+			game.softDropFrame++;
 		}
 		else
 		{
@@ -557,7 +585,7 @@ void g_updateGame()
 				else
 					game.current->nextMoveDir = DIR_SOUTHEAST;
 			}
-			
+		
 			//attempt to move tetro in this direction
 			if ( !tetro_move(game.current, game.current->nextMoveDir) )
 			{
@@ -568,6 +596,10 @@ void g_updateGame()
 				}
 			}
 		}
+		
+		
+
+		
 		
 		game.current->nextMoveX = DIR_NONE;
 		game.current->nextMoveY = DIR_NONE;
@@ -673,7 +705,10 @@ void g_drawGame()
 		
 		while (quotient > 0 && count < 6) //stops after score runs out of digits or 6 digits are drawn
 		{
-			i = (game.score / modifier) % 10;
+			if ( game.score >= MAX_SCORE )
+				i = 9;
+			else
+				i = (game.score / modifier) % 10;
 			image = g_loadImage(numIcon[i]);
 			g_addSurface(SCORE_FIRST_DIGIT_X-(NUMBER_LENGTH*count), SCORE_IMAGE_Y, image, screen);
 			

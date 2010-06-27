@@ -41,7 +41,9 @@
 #define NIL 0
 
 #define MAX_LEVELS 20
+#define MAX_SCORE 999999
 
+#define SOFT_DROP_FRAMES 3 //how many frames for a block to soft drop by 1 cell
 
 //===============================================
 //Video settings
@@ -66,10 +68,11 @@
 #define LINES_IMAGE_Y 392
 #define LEVEL_IMAGE_Y 250
 
-//the rightmost digit. the next digit is this number - 20
+//the rightmost digit. the next digit is this number - NUMBER_LENGTH
 #define LEVEL_FIRST_DIGIT_X 100
 #define LINES_FIRST_DIGIT_X 100
 #define SCORE_FIRST_DIGIT_X 120
+
 //===============================================
 //Scoring
 //===============================================
@@ -77,6 +80,7 @@
 #define SCORE_MODIFIER_TWO_LINES 100
 #define SCORE_MODIFIER_THREE_LINES 300
 #define SCORE_MODIFIER_FOUR_LINES 1200
+
 //boolean type, accepts true or false
 typedef enum
 {
