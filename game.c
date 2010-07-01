@@ -11,7 +11,7 @@ extern SDL_Surface * screen; //the screen surface. originally declared in main.c
 SDL_Surface * image; //used by g_drawGame()
 extern menu_t menu; //needed in this file to set its values in g_handleInput()
 gameModule game; //game module, stores levle, 2d grid and what it contains, etc
-extern highScoresStruct highScores;
+extern highScoresStruct_t highScores;
 
 //keeps track of how many rows are filled below row [ ].
 //used to figure out how far to move down blocks when erasing lines
@@ -147,6 +147,37 @@ char * blockIcon[] =
 	NULL //TETRO_RANDOM
 };
 
+spriteLoc_t chars[CHAR_SIZE] = 
+{
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //A
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //B
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //C
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //D
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //E
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //F
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //G
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //H
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //I
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //J
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //K
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //L
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //M
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //N
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //O
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //P
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //Q
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //R
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //S
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //T
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //U
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //V
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //W
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //X
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //Y
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //Z
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //UNDERSCORE
+};
+	
 int g_getScore()
 {
 	return game.score;
@@ -214,6 +245,8 @@ boolean g_removeBlockFromPos(block * b)
 
 void g_clear(gameOverReason_t r)
 {
+	printf("Game over...\n");
+	SDL_Delay(3000);
 	//clear tetrominoz
 	tetro_clear(game.next);
 	tetro_clear(game.current);
@@ -246,14 +279,29 @@ void g_create()
 	
 	for ( i = 0; i < SIZE_Y; i++ )
 		numRowsFilledBelow[i] = 0;
-
-	printf("Get Ready...\n");
 	
-	game.current = tetro_create(TETRO_RANDOM);
-	game.next = tetro_create(TETRO_RANDOM);
-//	SDL_Delay(2000); //2 seconds
+	//background
+	image = g_loadImage("./pictures/gamescreen.bmp");
+	if (image == NULL)
+		printf("[g_drawGame]: error loading an image!\n");
+	g_addSurface(0, 0, image, screen);
+	SDL_FreeSurface(image);
+	
+	//score, level, lines 0
+	image = g_loadImage(numIcon[0]);
+	g_addSurface(SCORE_FIRST_DIGIT_X, SCORE_IMAGE_Y, image, screen);
+	g_addSurface(LEVEL_FIRST_DIGIT_X, LEVEL_IMAGE_Y, image, screen);
+	g_addSurface(LINES_FIRST_DIGIT_X, LINES_IMAGE_Y, image, screen);
+	SDL_FreeSurface(image);
+	
+	printf("Get Ready...\n");
+	SDL_Flip(screen);
+	
+	SDL_Delay(2000); //2 seconds
 	
 	printf("GO GO GO\n");
+	game.current = tetro_create(TETRO_RANDOM);
+	game.next = tetro_create(TETRO_RANDOM);
 	tetro_moveToStart(game.current);
 	game.state = STATE_PLAYING;
 	//game.lastDropTime = SDL_GetTicks();
@@ -302,12 +350,12 @@ boolean g_addSurface(int x, int y, SDL_Surface * source, SDL_Surface * dest)
 	
 	if ( SDL_BlitSurface(source, NULL, dest, &offset) < 0 ) //<0 = fail
 	{
-		SDL_FreeSurface(source);
+		//SDL_FreeSurface(source);
 		return false;
 	}
 	else
 	{
-		SDL_FreeSurface(source);
+		//SDL_FreeSurface(source);
 		return true;
 	}
 }
@@ -685,46 +733,64 @@ void g_drawGame()
 			case M_MAIN:
 				image = g_loadImage("./pictures/menubackground.bmp");
 				g_addSurface(0, 0, image, screen);
+				SDL_FreeSurface(image);
 				
 				image = g_loadImage("./pictures/NEWGAME_NOBORDER.bmp");
 				g_addSurface(buttonLocX[S_NEWGAME], buttonLocY[S_NEWGAME], image, screen);
+				SDL_FreeSurface(image);
+				
 				image = g_loadImage("./pictures/HIGHSCORE_NOBORDER.bmp");
 				g_addSurface(buttonLocX[S_HIGHSCORES], buttonLocY[S_HIGHSCORES], image, screen);
+				SDL_FreeSurface(image);
+				
 				image = g_loadImage("./pictures/EXIT_NOBORDER.bmp");
 				g_addSurface(buttonLocX[S_EXIT], buttonLocY[S_EXIT], image, screen);
+				SDL_FreeSurface(image);
 				break;
 			case M_HIGHSCORES:
 				image = g_loadImage("./pictures/splash.bmp");
 				g_addSurface(0, 0, image, screen);
-				
+				SDL_FreeSurface(image);
 				
 				break;
 			case M_PAUSE:
 				image = g_loadImage("./pictures/menupaused.bmp");
 				g_addSurface(0, 0, image, screen);
+				SDL_FreeSurface(image);
 				
 				image = g_loadImage("./pictures/CONTINUE_NOBORDER.bmp");
 				g_addSurface(buttonLocX[S_CONTINUE], buttonLocY[S_CONTINUE], image, screen);
+				SDL_FreeSurface(image);
+				
 				image = g_loadImage("./pictures/QUITGAME_NOBORDER.bmp");
 				g_addSurface(buttonLocX[S_QUIT], buttonLocY[S_QUIT], image, screen);
+				SDL_FreeSurface(image);
 				break;
 			case M_PAUSECONFIRMQUIT:
 				image = g_loadImage("./pictures/menuconfirmquit.bmp");
 				g_addSurface(0, 0, image, screen);
+				SDL_FreeSurface(image);
 				
 				image = g_loadImage("./pictures/YES_NOBORDER.bmp");
 				g_addSurface(buttonLocX[S_YES], buttonLocY[S_YES], image, screen);
+				SDL_FreeSurface(image);
+				
 				image = g_loadImage("./pictures/NO_NOBORDER.bmp");
 				g_addSurface(buttonLocX[S_NO], buttonLocY[S_NO], image, screen);
+				SDL_FreeSurface(image);
 				break;
 			case M_EXIT:
 				image = g_loadImage("./pictures/menu_exitconfirm.bmp");
 				g_addSurface(0, 0, image, screen);
+				SDL_FreeSurface(image);
 				
 				image = g_loadImage("./pictures/YES_NOBORDER.bmp");
 				g_addSurface(buttonLocX[S_YES], buttonLocY[S_YES], image, screen);
+				SDL_FreeSurface(image);
+				
 				image = g_loadImage("./pictures/NO_NOBORDER.bmp");
 				g_addSurface(buttonLocX[S_NO], buttonLocY[S_NO], image, screen);
+				SDL_FreeSurface(image);
 				break;
 			default:
 				printf("[g_drawGame]: weird menu.menuLoc!\n");
@@ -735,6 +801,7 @@ void g_drawGame()
 		{
 			image = g_loadImage("./pictures/BORDER_GREEN.bmp");
 			g_addSurface(buttonLocX[menu.currentSelection], buttonLocY[menu.currentSelection], image, screen);
+			SDL_FreeSurface(image);
 		}
 	}
 	else if (game.state == STATE_PLAYING)
@@ -748,6 +815,7 @@ void g_drawGame()
 			printf("[g_drawGame]: error loading an image!\n");
 			
 		g_addSurface(0, 0, image, screen);
+		SDL_FreeSurface(image);
 		
 		
 		//SCORE
@@ -759,6 +827,7 @@ void g_drawGame()
 		{
 			image = g_loadImage(numIcon[0]);
 			g_addSurface(SCORE_FIRST_DIGIT_X, SCORE_IMAGE_Y, image, screen);
+			SDL_FreeSurface(image);
 		}
 		
 		while (quotient > 0 && count < 6) //stops after score runs out of digits or 6 digits are drawn
@@ -769,6 +838,7 @@ void g_drawGame()
 				i = (game.score / modifier) % 10;
 			image = g_loadImage(numIcon[i]);
 			g_addSurface(SCORE_FIRST_DIGIT_X-(NUMBER_LENGTH*count), SCORE_IMAGE_Y, image, screen);
+			SDL_FreeSurface(image);
 			
 			count++;
 			modifier *= 10;
@@ -784,6 +854,7 @@ void g_drawGame()
 		{
 			image = g_loadImage(numIcon[0]);
 			g_addSurface(LEVEL_FIRST_DIGIT_X, LEVEL_IMAGE_Y, image, screen);
+			SDL_FreeSurface(image);
 		}
 		
 		while (quotient > 0 && count < 2) //stops after level runs out of digits or 6 digits are drawn
@@ -791,6 +862,7 @@ void g_drawGame()
 			i = (game.level / modifier) % 10;
 			image = g_loadImage(numIcon[i]);
 			g_addSurface(LEVEL_FIRST_DIGIT_X-(NUMBER_LENGTH*count), LEVEL_IMAGE_Y, image, screen);
+			SDL_FreeSurface(image);
 			
 			count++;
 			modifier *= 10;
@@ -807,6 +879,7 @@ void g_drawGame()
 		{
 			image = g_loadImage(numIcon[0]);
 			g_addSurface(LINES_FIRST_DIGIT_X, LINES_IMAGE_Y, image, screen);
+			SDL_FreeSurface(image);
 		}
 		
 		while (quotient > 0 && count < 2) //stops after score runs out of digits or 6 digits are drawn
@@ -814,6 +887,7 @@ void g_drawGame()
 			i = (game.lines / modifier) % 10;
 			image = g_loadImage(numIcon[i]);
 			g_addSurface(LINES_FIRST_DIGIT_X-(NUMBER_LENGTH*count), LINES_IMAGE_Y, image, screen);
+			SDL_FreeSurface(image);
 			
 			count++;
 			modifier *= 10;
@@ -821,15 +895,20 @@ void g_drawGame()
 		}
 		
 		//draw next block in the box
-		for ( i = 0; i < TETRO_SIZE; i++ )
+		if (game.next != NULL)
 		{
-			//image = g_loadImage("./pictures/blocktemp.bmp");
 			image = g_loadBlockImage(tetro_getType(game.next));
-			x = stasisPixelCoordX[ stasisCoord[ tetro_getType(game.next) ].xCoord[i] ];
-			y = stasisPixelCoordY[ stasisCoord[ tetro_getType(game.next) ].yCoord[i] ];
-			//printf("[g_drawGame]: next block pixel coords = (%d, %d)\n", x, y);
-			
-			g_addSurface(x, y, image, screen);
+			for ( i = 0; i < TETRO_SIZE; i++ )
+			{
+				//image = g_loadImage("./pictures/blocktemp.bmp");
+				image = g_loadBlockImage(tetro_getType(game.next));
+				x = stasisPixelCoordX[ stasisCoord[ tetro_getType(game.next) ].xCoord[i] ];
+				y = stasisPixelCoordY[ stasisCoord[ tetro_getType(game.next) ].yCoord[i] ];
+				//printf("[g_drawGame]: next block pixel coords = (%d, %d)\n", x, y);
+
+				g_addSurface(x, y, image, screen);
+			}
+			SDL_FreeSurface(image);
 		}
 		
 		//draw every block in play
@@ -849,6 +928,7 @@ void g_drawGame()
 					}
 					g_getImageCoords(i, j, &x, &y);
 					g_addSurface(x, y, image, screen);
+					SDL_FreeSurface(image);
 				}					
 			}
 			
@@ -920,7 +1000,9 @@ void g_onDownBlocked()
 	short i, j, k;
 	short x = -1, y = -1;
 	int count = 0;
-	SDL_Surface * blockFlash;
+	//SDL_Surface * blockFlash;
+	SDL_Surface * flash1;
+	SDL_Surface * flash2;
 	block * b;
 	int flashCount;
 	
@@ -990,6 +1072,11 @@ void g_onDownBlocked()
 		//k = index for a row to flash
 		//i = current x position
 		//j = y position (row). fullRows[k]
+		
+		//flash1 = g_loadBlockImage(block_getType(b));
+		flash1 = g_loadImage("./pictures/BLOCK_FLASH1.bmp");
+		flash2 = g_loadImage("./pictures/BLOCK_FLASH2.bmp");
+		
 		for ( flashCount = 0; flashCount < FLASH_FRAMES; flashCount++ )
 		{
 			for ( k = 0; k < count; k++ )
@@ -998,18 +1085,22 @@ void g_onDownBlocked()
 				{
 					b = g_getBlockAtPos(i, fullRows[k]);
 					
-					if ( flashCount % 2 == 1 )
-						blockFlash = g_loadBlockImage(block_getType(b));
-					else
-						blockFlash = g_loadImage("./pictures/BLOCK_FLASH1.bmp");
 					g_getImageCoords(i, fullRows[k], &x, &y);
-					g_addSurface(x, y, blockFlash, screen);
+					if ( flashCount % 2 == 1 )
+						g_addSurface(x, y, flash1, screen);
+					else
+						g_addSurface(x, y, flash2, screen);
+					
+					//g_addSurface(x, y, blockFlash, screen);
 				}
 			}
 		
 			SDL_Flip(screen);
 			SDL_Delay(FLASH_INTERVAL);
 		}
+		SDL_FreeSurface(flash1);
+		SDL_FreeSurface(flash2);
+		
 		printf("[g_onDownBlocked]: finished flashing\n");
 		
 		//remove all those blocks

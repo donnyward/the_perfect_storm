@@ -4,7 +4,7 @@
 
 
 SDL_Surface * screen;
-highScoresStruct highScores;
+highScoresStruct_t highScores;
 
 void checkHighScores();
 
@@ -42,7 +42,7 @@ int main(int argc, char * argv[])
 			printf("[main]: Splash failed to Blit!\n");
 			
 		SDL_Flip(screen); //updates entire screen
-		//SDL_FreeSurface(splash); //clear splash from memory, its on screen now
+		SDL_FreeSurface(splash); //clear splash from memory, its on screen now
 	}
 	
 	//set some initial values for the gameModule
@@ -61,7 +61,7 @@ int main(int argc, char * argv[])
 
 void checkHighScores()
 {
-	highScoresStruct data;
+	highScoresStruct_t data;
 	FILE * f;
 	
 	f = fopen("hs.dat", "rb");
@@ -70,7 +70,7 @@ void checkHighScores()
 	{
 		printf("[checkHighScores]: hs.dat already exists!\n");
 		
-		fread(&highScores, sizeof(highScoresStruct), 1, f);
+		fread(&highScores, sizeof(highScoresStruct_t), 1, f);
 
 	}
 	else
@@ -100,7 +100,7 @@ void checkHighScores()
 		data.scores[8] = HIGH_SCORES_8;
 		data.scores[9] = HIGH_SCORES_9;
 	
-		fwrite(&data, sizeof(highScoresStruct), 1, f);
+		fwrite(&data, sizeof(highScoresStruct_t), 1, f);
 		
 		highScores = data;
 	}

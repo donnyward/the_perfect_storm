@@ -75,6 +75,11 @@
 #define LINES_FIRST_DIGIT_X 100
 #define SCORE_FIRST_DIGIT_X 120
 
+//for character bitmap font
+#define CHAR_SIZE 27 //A-Z + underscore
+#define CHAR_WIDTH 20
+#define CHAR_HEIGHT 20
+
 //===============================================
 //Scoring
 //===============================================
@@ -169,6 +174,45 @@ typedef struct
 	char name7[INITIALS_SIZE];
 	char name8[INITIALS_SIZE];
 	char name9[INITIALS_SIZE];
-} highScoresStruct;
+} highScoresStruct_t;
+
+typedef enum
+{
+	A,
+	B,
+	C,
+	D,
+	E,
+	F,
+	G,
+	H,
+	I,
+	J,
+	K,
+	L,
+	M,
+	N,
+	O,
+	P,
+	Q,
+	R,
+	S,
+	T,
+	U,
+	V,
+	W,
+	X,
+	Y,
+	Z,
+	UNDERSCORE,
+} characters_t;
+
+typedef struct
+{
+	int x;
+	int y;
+	int width;
+	int height;
+} spriteLoc_t;
 
 #endif
