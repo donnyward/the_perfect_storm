@@ -8,7 +8,7 @@
 #include "menu.h"
 
 extern SDL_Surface * screen; //the screen surface. originally declared in main.c
-SDL_Surface * image; //used by g_drawGame()
+//SDL_Surface * image; //used by g_drawGame()
 extern menu_t menu; //needed in this file to set its values in g_handleInput()
 gameModule game; //game module, stores levle, 2d grid and what it contains, etc
 extern highScoresStruct_t highScores;
@@ -17,6 +17,8 @@ extern highScoresStruct_t highScores;
 //used to figure out how far to move down blocks when erasing lines
 int numRowsFilledBelow[SIZE_Y];
 int dropFrameInterval = 0;
+
+extern char * highScoresNameArray[];
 
 dir_t clockwiseDir[] = 
 {
@@ -93,6 +95,7 @@ coord_t stasisCoord[] =
 	{ {0, 1, 1, 2}, {0, 0, 1, 1} }
 };
 
+//how many frames between each periodic drop down (indexed based on level)
 int dropIntervalPerRow[] = 
 {
 	53, 49, 45, 41, 37,
@@ -147,6 +150,7 @@ char * blockIcon[] =
 	NULL //TETRO_RANDOM
 };
 
+//location on the sprite sheet for characters
 spriteLoc_t chars[CHAR_SIZE] = 
 {
 	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //A
@@ -176,6 +180,7 @@ spriteLoc_t chars[CHAR_SIZE] =
 	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //Y
 	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //Z
 	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //UNDERSCORE
+	{0,0,CHAR_WIDTH,CHAR_HEIGHT}, //SPACE
 };
 	
 int g_getScore()
@@ -267,6 +272,7 @@ void g_end()
 void g_create()
 {
 	int i;
+	SDL_Surface * image;
 	
 	//set initial values for a gameModule new game
 	game.level = 0;
@@ -284,14 +290,14 @@ void g_create()
 	image = g_loadImage("./pictures/gamescreen.bmp");
 	if (image == NULL)
 		printf("[g_drawGame]: error loading an image!\n");
-	g_addSurface(0, 0, image, screen);
+	g_addSurface(0, 0, image, screen, NULL);
 	SDL_FreeSurface(image);
 	
 	//score, level, lines 0
 	image = g_loadImage(numIcon[0]);
-	g_addSurface(SCORE_FIRST_DIGIT_X, SCORE_IMAGE_Y, image, screen);
-	g_addSurface(LEVEL_FIRST_DIGIT_X, LEVEL_IMAGE_Y, image, screen);
-	g_addSurface(LINES_FIRST_DIGIT_X, LINES_IMAGE_Y, image, screen);
+	g_addSurface(SCORE_FIRST_DIGIT_X, SCORE_IMAGE_Y, image, screen, NULL);
+	g_addSurface(LEVEL_FIRST_DIGIT_X, LEVEL_IMAGE_Y, image, screen, NULL);
+	g_addSurface(LINES_FIRST_DIGIT_X, LINES_IMAGE_Y, image, screen, NULL);
 	SDL_FreeSurface(image);
 	
 	printf("Get Ready...\n");
@@ -341,14 +347,14 @@ SDL_Surface * g_loadBlockImage(tetroShape_t type)
 	return image;
 }
 
-boolean g_addSurface(int x, int y, SDL_Surface * source, SDL_Surface * dest)
+boolean g_addSurface(int x, int y, SDL_Surface * source, SDL_Surface * dest, SDL_Rect * clip)
 {
 	SDL_Rect offset;
 	
 	offset.x = x;
 	offset.y = y;
 	
-	if ( SDL_BlitSurface(source, NULL, dest, &offset) < 0 ) //<0 = fail
+	if ( SDL_BlitSurface(source, clip, dest, &offset) < 0 ) //<0 = fail
 	{
 		//SDL_FreeSurface(source);
 		return false;
@@ -357,6 +363,66 @@ boolean g_addSurface(int x, int y, SDL_Surface * source, SDL_Surface * dest)
 	{
 		//SDL_FreeSurface(source);
 		return true;
+	}
+}
+
+void g_blitMessageToLoc(int x, int y, char * msg)
+{
+	SDL_Surface * charSheet = NULL;
+	SDL_Rect clip;
+	characters_t currentChar;
+	
+	int i = 0;
+	
+	charSheet = g_loadImage("./pictures/char_sheet.bmp");
+	
+	if ( charSheet == NULL )
+	{
+		debug_msg("[g_blitMessageToLoc]: charSheet failed to load!\n");
+		return;
+	}
+	
+	while ( msg[i] != 0 )
+	{
+		printf("[g_blitMessageToLoc]: msg[%d] = %c\n", i, msg[i]);
+		if ( msg[i] == '_' )
+			currentChar = UNDERSCORE;
+		else if ( msg[i] == ' ' )
+			currentChar = SPACE;
+		else
+			currentChar = msg[i] - (int)('A'); //toUpper'd
+			
+		clip.x = chars[currentChar].x;
+		clip.y = chars[currentChar].y;
+		clip.w = chars[currentChar].width;
+		clip.h = chars[currentChar].height;
+		
+		g_addSurface(x, y, charSheet, screen, &clip);
+		
+		x += clip.w;
+		i++;
+	}
+	SDL_FreeSurface(charSheet);
+}
+
+void g_blitNumbersToLoc(int x, int y, int number)
+{
+	int modifier = 1; //short int is too small
+	short count = 0;
+	int quotient = number / modifier;
+	short i;
+	SDL_Surface * image;
+	
+	while (quotient > 0) //stops after score runs out of digits or 6 digits are drawn
+	{	
+		i = quotient % 10;
+		image = g_loadImage(numIcon[i]);
+		g_addSurface(x-(NUMBER_LENGTH*count), y, image, screen, NULL);
+		SDL_FreeSurface(image);
+			
+		count++;
+		modifier *= 10;
+		quotient = number / modifier;
 	}
 }
 
@@ -732,64 +798,75 @@ void g_drawGame()
 		{
 			case M_MAIN:
 				image = g_loadImage("./pictures/menubackground.bmp");
-				g_addSurface(0, 0, image, screen);
+				g_addSurface(0, 0, image, screen, NULL);
 				SDL_FreeSurface(image);
 				
 				image = g_loadImage("./pictures/NEWGAME_NOBORDER.bmp");
-				g_addSurface(buttonLocX[S_NEWGAME], buttonLocY[S_NEWGAME], image, screen);
+				g_addSurface(buttonLocX[S_NEWGAME], buttonLocY[S_NEWGAME], image, screen, NULL);
 				SDL_FreeSurface(image);
 				
 				image = g_loadImage("./pictures/HIGHSCORE_NOBORDER.bmp");
-				g_addSurface(buttonLocX[S_HIGHSCORES], buttonLocY[S_HIGHSCORES], image, screen);
+				g_addSurface(buttonLocX[S_HIGHSCORES], buttonLocY[S_HIGHSCORES], image, screen, NULL);
 				SDL_FreeSurface(image);
 				
 				image = g_loadImage("./pictures/EXIT_NOBORDER.bmp");
-				g_addSurface(buttonLocX[S_EXIT], buttonLocY[S_EXIT], image, screen);
+				g_addSurface(buttonLocX[S_EXIT], buttonLocY[S_EXIT], image, screen, NULL);
 				SDL_FreeSurface(image);
 				break;
 			case M_HIGHSCORES:
 				image = g_loadImage("./pictures/splash.bmp");
-				g_addSurface(0, 0, image, screen);
+				g_addSurface(0, 0, image, screen, NULL);
 				SDL_FreeSurface(image);
+				
+				x = HIGH_SCORES_FIRST_LETTER_LOC_X;
+				y = HIGH_SCORES_FIRST_LETTER_LOC_Y;
+				
+				for ( i = 0; i < HIGH_SCORES_LIST_SIZE; i++ )
+				{
+					g_blitMessageToLoc(x, y, highScoresNameArray[i]);
+					g_blitNumbersToLoc(HIGH_SCORES_FIRST_NUMBERS_LOC_X, y, highScores.scores[i]);
+					
+					y = y + (HIGH_SCORES_GAP + HIGH_SCORES_GAP);
+				}
 				
 				break;
 			case M_PAUSE:
 				image = g_loadImage("./pictures/menupaused.bmp");
-				g_addSurface(0, 0, image, screen);
+				g_addSurface(0, 0, image, screen, NULL);
 				SDL_FreeSurface(image);
 				
 				image = g_loadImage("./pictures/CONTINUE_NOBORDER.bmp");
-				g_addSurface(buttonLocX[S_CONTINUE], buttonLocY[S_CONTINUE], image, screen);
+				g_addSurface(buttonLocX[S_CONTINUE], buttonLocY[S_CONTINUE], image, screen, NULL);
 				SDL_FreeSurface(image);
 				
 				image = g_loadImage("./pictures/QUITGAME_NOBORDER.bmp");
-				g_addSurface(buttonLocX[S_QUIT], buttonLocY[S_QUIT], image, screen);
+				g_addSurface(buttonLocX[S_QUIT], buttonLocY[S_QUIT], image, screen, NULL);
 				SDL_FreeSurface(image);
 				break;
 			case M_PAUSECONFIRMQUIT:
 				image = g_loadImage("./pictures/menuconfirmquit.bmp");
-				g_addSurface(0, 0, image, screen);
+				g_addSurface(0, 0, image, screen, NULL);
 				SDL_FreeSurface(image);
 				
 				image = g_loadImage("./pictures/YES_NOBORDER.bmp");
-				g_addSurface(buttonLocX[S_YES], buttonLocY[S_YES], image, screen);
+				g_addSurface(buttonLocX[S_YES], buttonLocY[S_YES], image, screen, NULL);
 				SDL_FreeSurface(image);
 				
 				image = g_loadImage("./pictures/NO_NOBORDER.bmp");
-				g_addSurface(buttonLocX[S_NO], buttonLocY[S_NO], image, screen);
+				g_addSurface(buttonLocX[S_NO], buttonLocY[S_NO], image, screen, NULL);
 				SDL_FreeSurface(image);
 				break;
 			case M_EXIT:
 				image = g_loadImage("./pictures/menu_exitconfirm.bmp");
-				g_addSurface(0, 0, image, screen);
+				g_addSurface(0, 0, image, screen, NULL);
 				SDL_FreeSurface(image);
 				
 				image = g_loadImage("./pictures/YES_NOBORDER.bmp");
-				g_addSurface(buttonLocX[S_YES], buttonLocY[S_YES], image, screen);
+				g_addSurface(buttonLocX[S_YES], buttonLocY[S_YES], image, screen, NULL);
 				SDL_FreeSurface(image);
 				
 				image = g_loadImage("./pictures/NO_NOBORDER.bmp");
-				g_addSurface(buttonLocX[S_NO], buttonLocY[S_NO], image, screen);
+				g_addSurface(buttonLocX[S_NO], buttonLocY[S_NO], image, screen, NULL);
 				SDL_FreeSurface(image);
 				break;
 			default:
@@ -800,7 +877,7 @@ void g_drawGame()
 		if ( menu.menuLoc != M_HIGHSCORES )
 		{
 			image = g_loadImage("./pictures/BORDER_GREEN.bmp");
-			g_addSurface(buttonLocX[menu.currentSelection], buttonLocY[menu.currentSelection], image, screen);
+			g_addSurface(buttonLocX[menu.currentSelection], buttonLocY[menu.currentSelection], image, screen, NULL);
 			SDL_FreeSurface(image);
 		}
 	}
@@ -814,9 +891,8 @@ void g_drawGame()
 		if (image == NULL)
 			printf("[g_drawGame]: error loading an image!\n");
 			
-		g_addSurface(0, 0, image, screen);
+		g_addSurface(0, 0, image, screen, NULL);
 		SDL_FreeSurface(image);
-		
 		
 		//SCORE
 		modifier = 1;
@@ -826,23 +902,15 @@ void g_drawGame()
 		if ( game.score == 0 )
 		{
 			image = g_loadImage(numIcon[0]);
-			g_addSurface(SCORE_FIRST_DIGIT_X, SCORE_IMAGE_Y, image, screen);
+			g_addSurface(SCORE_FIRST_DIGIT_X, SCORE_IMAGE_Y, image, screen, NULL);
 			SDL_FreeSurface(image);
 		}
-		
-		while (quotient > 0 && count < 6) //stops after score runs out of digits or 6 digits are drawn
+		else
 		{
 			if ( game.score >= MAX_SCORE )
-				i = 9;
+				g_blitNumbersToLoc(SCORE_FIRST_DIGIT_X, SCORE_IMAGE_Y, MAX_SCORE);
 			else
-				i = (game.score / modifier) % 10;
-			image = g_loadImage(numIcon[i]);
-			g_addSurface(SCORE_FIRST_DIGIT_X-(NUMBER_LENGTH*count), SCORE_IMAGE_Y, image, screen);
-			SDL_FreeSurface(image);
-			
-			count++;
-			modifier *= 10;
-			quotient = game.score / modifier;
+				g_blitNumbersToLoc(SCORE_FIRST_DIGIT_X, SCORE_IMAGE_Y, game.score);
 		}
 
 		//LEVEL
@@ -853,22 +921,16 @@ void g_drawGame()
 		if ( game.level == 0 )
 		{
 			image = g_loadImage(numIcon[0]);
-			g_addSurface(LEVEL_FIRST_DIGIT_X, LEVEL_IMAGE_Y, image, screen);
+			g_addSurface(LEVEL_FIRST_DIGIT_X, LEVEL_IMAGE_Y, image, screen, NULL);
 			SDL_FreeSurface(image);
 		}
-		
-		while (quotient > 0 && count < 2) //stops after level runs out of digits or 6 digits are drawn
+		else
 		{
-			i = (game.level / modifier) % 10;
-			image = g_loadImage(numIcon[i]);
-			g_addSurface(LEVEL_FIRST_DIGIT_X-(NUMBER_LENGTH*count), LEVEL_IMAGE_Y, image, screen);
-			SDL_FreeSurface(image);
-			
-			count++;
-			modifier *= 10;
-			quotient = game.level / modifier;
+			if ( game.level >= MAX_LEVEL )
+				g_blitNumbersToLoc(LEVEL_FIRST_DIGIT_X, LEVEL_IMAGE_Y, MAX_LEVEL);
+			else
+				g_blitNumbersToLoc(LEVEL_FIRST_DIGIT_X, LEVEL_IMAGE_Y, game.level);
 		}
-		
 		
 		//LINES
 		modifier = 1;
@@ -878,21 +940,14 @@ void g_drawGame()
 		if ( game.lines == 0 )
 		{
 			image = g_loadImage(numIcon[0]);
-			g_addSurface(LINES_FIRST_DIGIT_X, LINES_IMAGE_Y, image, screen);
+			g_addSurface(LINES_FIRST_DIGIT_X, LINES_IMAGE_Y, image, screen, NULL);
 			SDL_FreeSurface(image);
 		}
-		
-		while (quotient > 0 && count < 2) //stops after score runs out of digits or 6 digits are drawn
+		else
 		{
-			i = (game.lines / modifier) % 10;
-			image = g_loadImage(numIcon[i]);
-			g_addSurface(LINES_FIRST_DIGIT_X-(NUMBER_LENGTH*count), LINES_IMAGE_Y, image, screen);
-			SDL_FreeSurface(image);
-			
-			count++;
-			modifier *= 10;
-			quotient = game.lines / modifier;
-		}
+			g_blitNumbersToLoc(LINES_FIRST_DIGIT_X, LINES_IMAGE_Y, game.lines);
+		}		
+
 		
 		//draw next block in the box
 		if (game.next != NULL)
@@ -906,7 +961,7 @@ void g_drawGame()
 				y = stasisPixelCoordY[ stasisCoord[ tetro_getType(game.next) ].yCoord[i] ];
 				//printf("[g_drawGame]: next block pixel coords = (%d, %d)\n", x, y);
 
-				g_addSurface(x, y, image, screen);
+				g_addSurface(x, y, image, screen, NULL);
 			}
 			SDL_FreeSurface(image);
 		}
@@ -927,7 +982,7 @@ void g_drawGame()
 						printf("[g_drawGame]: failed to load block image!\n");
 					}
 					g_getImageCoords(i, j, &x, &y);
-					g_addSurface(x, y, image, screen);
+					g_addSurface(x, y, image, screen, NULL);
 					SDL_FreeSurface(image);
 				}					
 			}
@@ -1087,11 +1142,11 @@ void g_onDownBlocked()
 					
 					g_getImageCoords(i, fullRows[k], &x, &y);
 					if ( flashCount % 2 == 1 )
-						g_addSurface(x, y, flash1, screen);
+						g_addSurface(x, y, flash1, screen, NULL);
 					else
-						g_addSurface(x, y, flash2, screen);
+						g_addSurface(x, y, flash2, screen, NULL);
 					
-					//g_addSurface(x, y, blockFlash, screen);
+					//g_addSurface(x, y, blockFlash, screen, NULL);
 				}
 			}
 		

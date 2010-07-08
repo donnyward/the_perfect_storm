@@ -90,7 +90,13 @@ SDL_Surface * g_loadBlockImage(tetroShape_t type);
 //takes a surface (containing a loaded image) and applys it to the main screen surface
 //with or without an offset
 //the screen must be flipped once all the adding is done
-boolean g_addSurface(int x, int y, SDL_Surface * source, SDL_Surface * dest);
+boolean g_addSurface(int x, int y, SDL_Surface * source, SDL_Surface * dest, SDL_Rect * clip);
+
+//takes a c-string and blits the bitmap font on the screen with (x, y) as top left corner of 1st char
+void g_blitMessageToLoc(int x, int y, char * msg);
+
+//takes a number and blits it in bitmap form. x and y are the loc to the rightmost digit
+void g_blitNumbersToLoc(int x, int y, int number);
 
 void debug_msg(char * msg); //prints messages to terminal if debug mode is enabled
 

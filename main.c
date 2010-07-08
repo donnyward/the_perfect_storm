@@ -5,6 +5,19 @@
 
 SDL_Surface * screen;
 highScoresStruct_t highScores;
+char * highScoresNameArray[] = 
+{
+	highScores.name0,
+	highScores.name1,
+	highScores.name2,
+	highScores.name3,
+	highScores.name4,
+	highScores.name5,
+	highScores.name6,
+	highScores.name7,
+	highScores.name8,
+	highScores.name9
+};
 
 void checkHighScores();
 
@@ -38,7 +51,7 @@ int main(int argc, char * argv[])
 		printf("[main]: No splash image found!\n");
 	else
 	{
-		if ( !g_addSurface(0, 0, splash, screen) )
+		if ( !g_addSurface(0, 0, splash, screen, NULL) )
 			printf("[main]: Splash failed to Blit!\n");
 			
 		SDL_Flip(screen); //updates entire screen
@@ -107,4 +120,19 @@ void checkHighScores()
 	
 	fclose(f);
 	printf("highScores.scores[2] = %d\n", highScores.scores[2]);
+	/*
+	highScoresNameArray = 
+	{
+		highScores.name0,
+		highScores.name1,
+		highScores.name2,
+		highScores.name3,
+		highScores.name4,
+		highScores.name5,
+		highScores.name6,
+		highScores.name7,
+		highScores.name8,
+		highScores.name9
+	};
+	*/
 }

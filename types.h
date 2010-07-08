@@ -40,13 +40,14 @@
 
 #define NIL 0
 
-#define MAX_LEVELS 20
+#define MAX_LEVEL 20
 #define MAX_SCORE 999999
 
 #define SOFT_DROP_FRAMES 3 //how many frames for a block to soft drop by 1 cell
 #define DAS_DELAY 11 //number of frames to wait for delayed auto shifting
 #define DAS_PERIOD 5 //how often to move one notch while DAS'ing
 
+#define ASCII_A 1 //the numerical value of ascii char A. subtracted from char's to get proper array loc for chars[]
 //===============================================
 //Video settings
 //===============================================
@@ -76,9 +77,16 @@
 #define SCORE_FIRST_DIGIT_X 120
 
 //for character bitmap font
-#define CHAR_SIZE 27 //A-Z + underscore
+#define CHAR_SIZE 28 //A-Z + underscore + space
 #define CHAR_WIDTH 20
 #define CHAR_HEIGHT 20
+
+//loc for 1st high scores entry
+#define HIGH_SCORES_FIRST_LETTER_LOC_X 40
+#define HIGH_SCORES_FIRST_LETTER_LOC_Y 80
+#define HIGH_SCORES_FIRST_NUMBERS_LOC_X 580
+#define HIGH_SCORES_FIRST_NUMBERS_LOC_Y 80
+#define HIGH_SCORES_GAP 20 //how much space in pixels between each high scores entry (vertical)
 
 //===============================================
 //Scoring
@@ -146,6 +154,7 @@ typedef enum
 	STATE_IDLE, //do nothing
 } gamestate_t;
 
+//loss = check for new high score, say game over, fill up screen with blocks
 typedef enum
 {
 	REASON_QUIT, //player quit
@@ -160,6 +169,7 @@ typedef struct
 	short yCoord[TETRO_SIZE];
 } coord_t;
 
+//single struct that stores the contents of the high scores
 typedef struct
 {
 	int scores[HIGH_SCORES_LIST_SIZE];
@@ -176,6 +186,7 @@ typedef struct
 	char name9[INITIALS_SIZE];
 } highScoresStruct_t;
 
+//enum for use with spriteLoc_t's
 typedef enum
 {
 	A,
@@ -205,8 +216,10 @@ typedef enum
 	Y,
 	Z,
 	UNDERSCORE,
+	SPACE,
 } characters_t;
 
+//for char sprite sheet. array with each cell representing a letter
 typedef struct
 {
 	int x;
