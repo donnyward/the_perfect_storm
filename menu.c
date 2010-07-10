@@ -6,6 +6,8 @@ extern gameModule game;
 
 boolean m_move()
 {
+	int i;
+	
 	if (menu.nextMoveDir == DIR_NONE)
 		return false;
 		
@@ -21,6 +23,26 @@ boolean m_move()
 		else if (menu.menuLoc == M_HIGHSCORES)
 		{
 			//do nothing
+		}
+		else if (menu.menuLoc == M_NEWHIGH)
+		{
+			//go backwards a letter
+			if (menu.menuLoc == M_NEWHIGH)
+			{
+				i = 0;
+				while (game.newHighScore[i] != 0)
+					i++;
+				i--; //i is sitting on the last char that was entered
+			
+				if (game.newHighScore[i] == 'A')
+					game.newHighScore[i] = ' ';
+				else if (game.newHighScore[i] == ' ')
+					game.newHighScore[i] = '_';
+				else if (game.newHighScore[i] == '_')
+					game.newHighScore[i] = 'Z';
+				else
+					game.newHighScore[i]--;
+			}
 		}
 		else if (menu.menuLoc == M_PAUSE)
 		{
@@ -54,6 +76,26 @@ boolean m_move()
 		else if (menu.menuLoc == M_HIGHSCORES)
 		{
 			//do nothing
+		}
+		else if (menu.menuLoc == M_NEWHIGH)
+		{
+			//go forward a letter
+			if (menu.menuLoc == M_NEWHIGH)
+			{
+				i = 0;
+				while (game.newHighScore[i] != 0)
+					i++;
+				i--; //i is sitting on the last char that was entered
+			
+				if (game.newHighScore[i] == 'Z')
+					game.newHighScore[i] = ' ';
+				else if (game.newHighScore[i] == ' ')
+					game.newHighScore[i] = '_';
+				else if (game.newHighScore[i] == '_')
+					game.newHighScore[i] = 'A';
+				else
+					game.newHighScore[i]++;
+			}
 		}
 		else if (menu.menuLoc == M_PAUSE)
 		{
@@ -150,6 +192,10 @@ boolean m_move()
 			menu.menuLoc = M_MAIN;
 			menu.currentSelection = S_HIGHSCORES;
 		}
+		else if (menu.menuLoc == M_NEWHIGH)
+		{
+			//do nothing
+		}
 		else if (menu.menuLoc == M_PAUSE)
 		{
 			//resume game
@@ -170,6 +216,33 @@ boolean m_move()
 		{
 			printf("[m_move]: ESC pushed, unhandled menu.menuLoc '%d'!\n", menu.menuLoc);
 			return false;
+		}
+	}
+	else if (menu.nextMoveDir == DIR_NORTHWEST) //go left (hack for entering initials in event of new high score)
+	{
+		if (menu.menuLoc == M_NEWHIGH)
+		{
+			i = 0;
+			while (game.newHighScore[i] != 0)
+				i++;
+			i--; //i is sitting on the last char that was entered
+			
+			game.newHighScore[i] = 0;
+		}
+	}
+	else if (menu.nextMoveDir == DIR_NORTHEAST) //go right
+	{
+		if (menu.menuLoc == M_NEWHIGH)
+		{
+			i = 0;
+			while (game.newHighScore[i] != 0)
+				i++;
+			//i--;
+			
+			if (i != 3)
+				game.newHighScore[i] = '_';
+			else
+				m_highScores(REASON_CHOSEN);
 		}
 	}
 	return true;

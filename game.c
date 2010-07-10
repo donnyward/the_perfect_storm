@@ -259,8 +259,21 @@ void g_clear(gameOverReason_t r)
 	g_clearGrid();
 	
 	//setup variables for menu
-	game.state = STATE_MENU;
-	m_init();
+	if (game.score > 100)
+	{
+		game.state = STATE_MENU;
+		menu.nextMoveDir = DIR_NONE;
+		menu.menuLoc = M_NEWHIGH;
+		game.newHighScore[0] = '_';
+		game.newHighScore[1] = 0;
+		game.newHighScore[2] = 0;
+		game.newHighScore[3] = 0;
+	}
+	else
+	{
+		game.state = STATE_MENU;
+		m_init();
+	}
 }
 
 void g_end()
@@ -493,6 +506,24 @@ void g_handleInput()
 							if (menu.nextMoveDir == DIR_NONE)
 								menu.nextMoveDir = DIR_NORTH;
 							else if (menu.nextMoveDir == DIR_SOUTH)
+							{
+								//cancel out opposite inputs
+								menu.nextMoveDir = DIR_NONE;
+							}
+							break;
+						case SDLK_LEFT:
+							if (menu.nextMoveDir == DIR_NONE)
+								menu.nextMoveDir = DIR_NORTHWEST;
+							else if (menu.nextMoveDir == DIR_NORTHEAST)
+							{
+								//cancel out opposite inputs
+								menu.nextMoveDir = DIR_NONE;
+							}
+							break;
+						case SDLK_RIGHT:
+							if (menu.nextMoveDir == DIR_NONE)
+								menu.nextMoveDir = DIR_NORTHEAST;
+							else if (menu.nextMoveDir == DIR_NORTHWEST)
 							{
 								//cancel out opposite inputs
 								menu.nextMoveDir = DIR_NONE;
@@ -814,7 +845,7 @@ void g_drawGame()
 				SDL_FreeSurface(image);
 				break;
 			case M_HIGHSCORES:
-				image = g_loadImage("./pictures/splash.bmp");
+				image = g_loadImage("./pictures/highscores_background.bmp");
 				g_addSurface(0, 0, image, screen, NULL);
 				SDL_FreeSurface(image);
 				
@@ -829,6 +860,13 @@ void g_drawGame()
 					y = y + (HIGH_SCORES_GAP + HIGH_SCORES_GAP);
 				}
 				
+				break;
+			case M_NEWHIGH:
+				image = g_loadImage("./pictures/newhighscoresentry.bmp");
+				g_addSurface(0, 0, image, screen, NULL);
+				SDL_FreeSurface(image);
+				
+				g_blitMessageToLoc(NEW_HIGH_SCORE_X, NEW_HIGH_SCORE_Y, game.newHighScore);
 				break;
 			case M_PAUSE:
 				image = g_loadImage("./pictures/menupaused.bmp");
@@ -869,6 +907,7 @@ void g_drawGame()
 				g_addSurface(buttonLocX[S_NO], buttonLocY[S_NO], image, screen, NULL);
 				SDL_FreeSurface(image);
 				break;
+			
 			default:
 				printf("[g_drawGame]: weird menu.menuLoc!\n");
 				break;

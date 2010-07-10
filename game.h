@@ -44,6 +44,9 @@ typedef struct gameModule
 	dir_t dasDir;
 	int dasFrame;
 	boolean dasDelaying;
+	
+	//for entering new high scores
+	char newHighScore[INITIALS_SIZE];
 } gameModule;
 
 //===============================================

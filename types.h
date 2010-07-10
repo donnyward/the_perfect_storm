@@ -88,6 +88,9 @@
 #define HIGH_SCORES_FIRST_NUMBERS_LOC_Y 80
 #define HIGH_SCORES_GAP 20 //how much space in pixels between each high scores entry (vertical)
 
+//where on the screen to show your initials whilst entering your initials
+#define NEW_HIGH_SCORE_X 400
+#define NEW_HIGH_SCORE_Y 200
 //===============================================
 //Scoring
 //===============================================
