@@ -120,19 +120,4 @@ void checkHighScores()
 	
 	fclose(f);
 	printf("highScores.scores[2] = %d\n", highScores.scores[2]);
-	/*
-	highScoresNameArray = 
-	{
-		highScores.name0,
-		highScores.name1,
-		highScores.name2,
-		highScores.name3,
-		highScores.name4,
-		highScores.name5,
-		highScores.name6,
-		highScores.name7,
-		highScores.name8,
-		highScores.name9
-	};
-	*/
 }

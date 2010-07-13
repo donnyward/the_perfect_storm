@@ -101,6 +101,7 @@
 
 //high scores list
 #define HIGH_SCORES_LIST_SIZE 10
+/*
 #define HIGH_SCORES_0 500000
 #define HIGH_SCORES_1 400000
 #define HIGH_SCORES_2 350000
@@ -111,6 +112,17 @@
 #define HIGH_SCORES_7 100000
 #define HIGH_SCORES_8 50000
 #define HIGH_SCORES_9 10000
+*/
+#define HIGH_SCORES_0 1000
+#define HIGH_SCORES_1 900
+#define HIGH_SCORES_2 800
+#define HIGH_SCORES_3 700
+#define HIGH_SCORES_4 600
+#define HIGH_SCORES_5 500
+#define HIGH_SCORES_6 400
+#define HIGH_SCORES_7 300
+#define HIGH_SCORES_8 200
+#define HIGH_SCORES_9 100
 #define INITIALS_SIZE 4 //last is null termin8er
 
 //boolean type, accepts true or false

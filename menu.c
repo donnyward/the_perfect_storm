@@ -3,10 +3,13 @@
 
 menu_t menu;
 extern gameModule game;
+extern highScoresStruct_t highScores;
+extern char * highScoresNameArray[];
 
 boolean m_move()
 {
 	int i;
+	FILE * f; //for amending high scores
 	
 	if (menu.nextMoveDir == DIR_NONE)
 		return false;
@@ -241,8 +244,17 @@ boolean m_move()
 			
 			if (i != 3)
 				game.newHighScore[i] = '_';
-			else
+			else //done entering initials
+			{
+				strcpy(highScoresNameArray[game.highScoreIndexToReplace], game.newHighScore);
+				highScores.scores[game.highScoreIndexToReplace] = game.score;
+				
+				f = fopen("hs.dat", "w+b");
+				fwrite(&highScores, sizeof(highScoresStruct_t), 1, f);
+				fclose(f);
+				
 				m_highScores(REASON_CHOSEN);
+			}
 		}
 	}
 	return true;

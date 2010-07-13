@@ -250,6 +250,8 @@ boolean g_removeBlockFromPos(block * b)
 
 void g_clear(gameOverReason_t r)
 {
+	int i;
+	boolean newHighScore = false;
 	printf("Game over...\n");
 	SDL_Delay(3000);
 	//clear tetrominoz
@@ -258,20 +260,30 @@ void g_clear(gameOverReason_t r)
 	
 	g_clearGrid();
 	
-	//setup variables for menu
-	if (game.score > 100)
+	for ( i = 0; i < HIGH_SCORES_LIST_SIZE; i++ )
 	{
-		game.state = STATE_MENU;
+		if (game.score > highScores.scores[i])
+		{
+			newHighScore = true;
+			break;
+		}
+	}
+			
+	game.state = STATE_MENU;
+	
+	if (newHighScore)
+	{
 		menu.nextMoveDir = DIR_NONE;
 		menu.menuLoc = M_NEWHIGH;
 		game.newHighScore[0] = '_';
 		game.newHighScore[1] = 0;
 		game.newHighScore[2] = 0;
 		game.newHighScore[3] = 0;
+		game.highScoreIndexToReplace = i;
 	}
 	else
 	{
-		game.state = STATE_MENU;
+		
 		m_init();
 	}
 }

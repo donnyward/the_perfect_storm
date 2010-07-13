@@ -47,6 +47,7 @@ typedef struct gameModule
 	
 	//for entering new high scores
 	char newHighScore[INITIALS_SIZE];
+	int highScoreIndexToReplace;
 } gameModule;
 
 //===============================================
