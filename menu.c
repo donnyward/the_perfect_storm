@@ -40,9 +40,9 @@ boolean m_move()
 				if (game.newHighScore[i] == 'A')
 					game.newHighScore[i] = ' ';
 				else if (game.newHighScore[i] == ' ')
-					game.newHighScore[i] = '_';
-				else if (game.newHighScore[i] == '_')
 					game.newHighScore[i] = 'Z';
+				//else if (game.newHighScore[i] == '_')
+				//	game.newHighScore[i] = 'Z';
 				else
 					game.newHighScore[i]--;
 			}
@@ -93,9 +93,9 @@ boolean m_move()
 				if (game.newHighScore[i] == 'Z')
 					game.newHighScore[i] = ' ';
 				else if (game.newHighScore[i] == ' ')
-					game.newHighScore[i] = '_';
-				else if (game.newHighScore[i] == '_')
 					game.newHighScore[i] = 'A';
+//				else if (game.newHighScore[i] == '_')
+//					game.newHighScore[i] = 'A';
 				else
 					game.newHighScore[i]++;
 			}
@@ -230,7 +230,12 @@ boolean m_move()
 				i++;
 			i--; //i is sitting on the last char that was entered
 			
-			game.newHighScore[i] = 0;
+			if ( i <= 0 )
+			{
+				//do nothing, always have 1st letter displayed
+			}
+			else
+				game.newHighScore[i] = 0;
 		}
 	}
 	else if (menu.nextMoveDir == DIR_NORTHEAST) //go right
@@ -240,10 +245,9 @@ boolean m_move()
 			i = 0;
 			while (game.newHighScore[i] != 0)
 				i++;
-			//i--;
 			
 			if (i != 3)
-				game.newHighScore[i] = '_';
+				game.newHighScore[i] = ' ';
 			else //done entering initials
 			{
 				strcpy(highScoresNameArray[game.highScoreIndexToReplace], game.newHighScore);

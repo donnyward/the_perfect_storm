@@ -121,8 +121,8 @@
 #define HIGH_SCORES_5 500
 #define HIGH_SCORES_6 400
 #define HIGH_SCORES_7 300
-#define HIGH_SCORES_8 200
-#define HIGH_SCORES_9 100
+#define HIGH_SCORES_8 90
+#define HIGH_SCORES_9 5
 #define INITIALS_SIZE 4 //last is null termin8er
 
 //boolean type, accepts true or false

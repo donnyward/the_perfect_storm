@@ -275,7 +275,7 @@ void g_clear(gameOverReason_t r)
 	{
 		menu.nextMoveDir = DIR_NONE;
 		menu.menuLoc = M_NEWHIGH;
-		game.newHighScore[0] = '_';
+		game.newHighScore[0] = ' ';
 		game.newHighScore[1] = 0;
 		game.newHighScore[2] = 0;
 		game.newHighScore[3] = 0;
@@ -766,6 +766,7 @@ void g_updateGame()
 					g_onDownBlocked();
 					game.softDropFrame = SOFT_DROP_FRAMES; //next block insta drop down
 					game.score += game.softDropDistanceCount;
+					game.softDropDistanceCount = 0;
 				}
 				else
 					game.softDropDistanceCount++;
@@ -879,6 +880,14 @@ void g_drawGame()
 				SDL_FreeSurface(image);
 				
 				g_blitMessageToLoc(NEW_HIGH_SCORE_X, NEW_HIGH_SCORE_Y, game.newHighScore);
+				
+				i = 0;
+				
+				while ( game.newHighScore[i] != 0 )
+					i++;	
+				i--;
+				
+				g_blitMessageToLoc(NEW_HIGH_SCORE_X+(CHAR_WIDTH*i), NEW_HIGH_SCORE_Y, "_");
 				break;
 			case M_PAUSE:
 				image = g_loadImage("./pictures/menupaused.bmp");
