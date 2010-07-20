@@ -1238,13 +1238,9 @@ void g_onDownBlocked()
 	}
 	
 	//calculate level here
-	/*
-	if ( game.level*10 <= game.lines )
-	{
-		game.level++;
-	}
-	*/
 	game.level = game.lines/10;
+	if (game.level > MAX_LEVEL)
+		game.level = MAX_LEVEL;
 	
 	//full line(s) exist, flash them then remove, then drop above blocks down
 	if ( count > 0 )

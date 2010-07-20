@@ -27,7 +27,7 @@ int main(int argc, char * argv[])
 	
 	printf("Loading SDL...\n");
 	//init screen surface
-	if ( SDL_Init( SDL_INIT_EVERYTHING ) != 0 ) //init basics (event handling, filei/o and threading) + video + timer (for constant update rate)
+	if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) != 0 ) //init basics (event handling, filei/o and threading) + video + timer (for constant update rate)
 	{
 		printf("Error initializing SDL. Reason: %s\n", SDL_GetError()); // <1 = fail
 		return false;
@@ -35,7 +35,13 @@ int main(int argc, char * argv[])
 
 	printf("Setting Video mode to %dx%d, %d bit depth...\n", SCREEN_WIDTH, SCREEN_HEIGHT, BIT_DEPTH);
 	//set video mode
-	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, BIT_DEPTH, SDL_SWSURFACE);
+	/* from sdl documentation (on SDL_SetVideoMode):
+	The returned surface is freed by SDL_Quit and must not be freed by the caller.
+	This rule also includes consecutive calls to SDL_!SetVideoMode 
+	(i.e. resize or resolution change) because the existing surface will be released automatically. 
+	Whatever flags SDL_!SetVideoMode  could satisfy are set in the flags member of the returned surface.
+	*/
+	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, BIT_DEPTH, SDL_SWSURFACE);// | SDL_FULLSCREEN);
 	if (screen == NULL) //fail
 	{
 		printf("Error setting video mode to %dx%d, %d bit depth: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, BIT_DEPTH, SDL_GetError());
@@ -119,5 +125,4 @@ void checkHighScores()
 	}
 	
 	fclose(f);
-	printf("highScores.scores[2] = %d\n", highScores.scores[2]);
 }
