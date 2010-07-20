@@ -460,7 +460,7 @@ void g_blitNumbersToLoc(int x, int y, int number)
 	short i;
 	SDL_Surface * image;
 	
-	while (quotient > 0) //stops after score runs out of digits or 6 digits are drawn
+	while (quotient > 0) //stops after score runs out of digits
 	{	
 		i = quotient % 10;
 		image = g_loadImage(numIcon[i]);
@@ -488,7 +488,7 @@ void g_loop()
 	while ( !game.exitGameYet )
 	{
 		startTime = SDL_GetTicks();
-		//get time passed since last loop and see if enough time has passed for another update (target = 30 fps)
+		//get time passed since last loop and see if enough time has passed for another update (target = 60 fps)
 		//take note of the current time (for next loop around)
 		
 		
@@ -997,7 +997,7 @@ void g_drawGame()
 				break;
 		}
 		//no selection border for high scores screen
-		if ( menu.menuLoc != M_HIGHSCORES )
+		if ( menu.menuLoc != M_HIGHSCORES  && menu.menuLoc != M_NEWHIGH )
 		{
 			image = g_loadImage("./pictures/BORDER_GREEN.bmp");
 			g_addSurface(buttonLocX[menu.currentSelection], buttonLocY[menu.currentSelection], image, screen, NULL);
