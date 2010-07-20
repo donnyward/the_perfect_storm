@@ -254,10 +254,18 @@ void g_clear(gameOverReason_t r)
 {
 	int i;
 	boolean newHighScore = false;
-	printf("Game over...\n");
+	SDL_Surface * image;
 	
 	if (r == REASON_LOSS)
 	{
+		SDL_Delay(500);
+		
+		printf("Game over...\n");
+		image = g_loadImage("./pictures/GAME_OVER.bmp");
+		g_addSurface(TEXT_GAMEOVER_X, TEXT_GAMEOVER_Y, image, screen, NULL);
+		SDL_FreeSurface(image);
+		SDL_Flip(screen);
+		
 		SDL_Delay(GAME_OVER_PAUSE);
 		
 		for ( i = 0; i < HIGH_SCORES_LIST_SIZE; i++ )
@@ -329,11 +337,21 @@ void g_create()
 	SDL_FreeSurface(image);
 	
 	printf("Get Ready...\n");
+	image = g_loadImage("./pictures/GET_READY.bmp");
+	g_addSurface(TEXT_GETREADY_X, TEXT_GETREADY_Y, image, screen, NULL);
+	SDL_FreeSurface(image);
 	SDL_Flip(screen);
 	
 	SDL_Delay(2000); //2 seconds
 	
 	printf("GO GO GO\n");
+	image = g_loadImage("./pictures/GOGOGO.bmp");
+	g_addSurface(TEXT_GOGOGO_X, TEXT_GOGOGO_Y, image, screen, NULL);
+	SDL_FreeSurface(image);
+	SDL_Flip(screen);
+	
+	SDL_Delay(500);
+	
 	game.current = tetro_create(TETRO_RANDOM);
 	game.next = tetro_create(TETRO_RANDOM);
 	tetro_moveToStart(game.current);

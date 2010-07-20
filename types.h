@@ -52,6 +52,7 @@
 
 #define LOSS_PAUSE 1500 //how long to pause when theres no room for the next block to enter the field
 #define GAME_OVER_PAUSE 3000 //how long to say game over
+
 //===============================================
 //Video settings
 //===============================================
@@ -95,6 +96,15 @@
 //where on the screen to show your initials whilst entering your initials
 #define NEW_HIGH_SCORE_X 400
 #define NEW_HIGH_SCORE_Y 200
+
+//locations for some pre baked text
+#define TEXT_GETREADY_X 195
+#define TEXT_GETREADY_Y 30
+#define TEXT_GOGOGO_X 195
+#define TEXT_GOGOGO_Y 130
+#define TEXT_GAMEOVER_X 195
+#define TEXT_GAMEOVER_Y 100
+
 //===============================================
 //Scoring
 //===============================================
