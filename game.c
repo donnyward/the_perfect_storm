@@ -12,6 +12,7 @@ extern SDL_Surface * screen; //the screen surface. originally declared in main.c
 extern menu_t menu; //needed in this file to set its values in g_handleInput()
 gameModule game; //game module, stores levle, 2d grid and what it contains, etc
 extern highScoresStruct_t highScores;
+extern int debug_mode;
 
 //keeps track of how many rows are filled below row [ ].
 //used to figure out how far to move down blocks when erasing lines
@@ -474,7 +475,7 @@ void g_blitNumbersToLoc(int x, int y, int number)
 
 void debug_msg(char * msg)
 {
-	if (DEBUG_MODE)
+	if (debug_mode)
 		printf("%s", msg);
 }
 
@@ -521,7 +522,6 @@ void g_handleInput()
 		switch (event.type)
 		{
 			case SDL_KEYDOWN:
-				//printf("[g_handleInput()]: A key was pushed down!\n");
 				if (game.state == STATE_MENU)
 				{
 					switch (event.key.keysym.sym) //figure out what key
@@ -603,7 +603,7 @@ void g_handleInput()
 							game.softDropDistanceCount = 0;
 							break;
 						case SDLK_UP:
-							if (!DEBUG_MODE)
+							if (!debug_mode)
 								break;
 							if (game.current->nextMoveY == DIR_NONE)
 								game.current->nextMoveY = DIR_NORTH;

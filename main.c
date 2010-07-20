@@ -19,6 +19,8 @@ char * highScoresNameArray[] =
 	highScores.name9
 };
 
+int debug_mode = 0;
+
 void checkHighScores();
 
 int main(int argc, char * argv[])
@@ -31,6 +33,8 @@ int main(int argc, char * argv[])
 	{
 		if ( !strcmp(argv[i], "-fullscreen") )
 			isFullScreen = true;
+		else if ( !strcmp(argv[i], "-dev") )
+			debug_mode = 1;
 		else
 			printf("[main]: unrecognized parameter '%s'\n", argv[i]);
 	}
