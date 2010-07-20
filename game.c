@@ -123,6 +123,7 @@ char blockIconO[] = "./pictures/BLOCK_O.bmp";
 char blockIconS[] = "./pictures/BLOCK_S.bmp";
 char blockIconT[] = "./pictures/BLOCK_T.bmp";
 char blockIconZ[] = "./pictures/BLOCK_Z.bmp";
+char blockIconDEAD[] = "./pictures/BLOCK_DEAD.bmp";
 
 char * numIcon[] = 
 {
@@ -147,6 +148,7 @@ char * blockIcon[] =
 	blockIconS,
 	blockIconT,
 	blockIconZ,
+	blockIconDEAD,
 	NULL //TETRO_RANDOM
 };
 
@@ -253,21 +255,25 @@ void g_clear(gameOverReason_t r)
 	int i;
 	boolean newHighScore = false;
 	printf("Game over...\n");
-	SDL_Delay(3000);
+	
+	if (r == REASON_LOSS)
+	{
+		SDL_Delay(GAME_OVER_PAUSE);
+		
+		for ( i = 0; i < HIGH_SCORES_LIST_SIZE; i++ )
+		{
+			if (game.score > highScores.scores[i])
+			{
+				newHighScore = true;
+				break;
+			}
+		}
+	}
+	
 	//clear tetrominoz
 	tetro_clear(game.next);
 	tetro_clear(game.current);
-	
 	g_clearGrid();
-	
-	for ( i = 0; i < HIGH_SCORES_LIST_SIZE; i++ )
-	{
-		if (game.score > highScores.scores[i])
-		{
-			newHighScore = true;
-			break;
-		}
-	}
 			
 	game.state = STATE_MENU;
 	
@@ -282,10 +288,7 @@ void g_clear(gameOverReason_t r)
 		game.highScoreIndexToReplace = i;
 	}
 	else
-	{
-		
 		m_init();
-	}
 }
 
 void g_end()
@@ -813,6 +816,48 @@ void g_updateGame()
 
 		dropFrameInterval++;
 	}
+	else if (game.state == STATE_LOSS)
+	{
+		//the idea: every frame fill up one of the spaces with a "dead" block. so in 180 frames the whole screen will be filled
+		short i;
+		block * b;
+		
+		if (game.lossFrame == -1)
+		{
+			//do nothing
+		}
+		else
+		{
+			if (game.lossCurrentRow >= SIZE_Y)
+			{
+				g_clear(REASON_LOSS);
+			}
+			else
+			{
+				if (game.lossFrame == 0)
+					SDL_Delay(LOSS_PAUSE);
+				
+				if (game.lossFrame % 3 == 0)
+				{
+					for ( i = 0; i < SIZE_X; i++ )
+					{
+						b = g_getBlockAtPos(i, game.lossCurrentRow);
+						if (b != NULL)
+							g_removeBlockFromPos(b);
+						b = NULL;
+					
+						b = block_create(TETRO_DEAD, NULL);
+						if ( !block_teleport(b, i, game.lossCurrentRow) )
+							printf("[g_updateGame]: STATE_LOSS- error teleporting dead block into position!\n");
+						b = NULL;
+					}
+					game.lossCurrentRow++;
+				}
+			}
+		}
+		
+		game.lossFrame++;
+	}		
 	else
 		printf("[g_updateGame]: unknown game.state!\n");
 	
@@ -941,7 +986,7 @@ void g_drawGame()
 			SDL_FreeSurface(image);
 		}
 	}
-	else if (game.state == STATE_PLAYING)
+	else if (game.state == STATE_PLAYING || game.state == STATE_LOSS)
 	{
 		//draw the background,
 		//then score, level, next block in stasis, and loop thru the 2d pos array
@@ -1049,6 +1094,9 @@ void g_drawGame()
 			
 		}
 	}
+	else
+		printf("[g_drawGame]: unrecognized game.state!\n");
+		
 	
 	SDL_Flip(screen);
 }
@@ -1243,8 +1291,14 @@ void g_onDownBlocked()
 	game.next = tetro_create(TETRO_RANDOM);
 	if ( !tetro_moveToStart(game.current) )
 	{
-		printf("[g_onDownBlocked]: GAME OVER!\n");
-		g_clear(REASON_LOSS);
+		//printf("[g_onDownBlocked]: GAME OVER!\n");
+		//g_clear(REASON_LOSS);
+		game.state = STATE_LOSS;
+		
+		//on frame -1 do nothing, frame 0 pauses briefly so you can see the last tetromino that couldnt get in,
+		//then the screen fills up rapidly
+		game.lossFrame = -1;
+		game.lossCurrentRow = 0;
 	}
 }
 

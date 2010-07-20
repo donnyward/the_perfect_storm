@@ -327,7 +327,7 @@ boolean block_setType(block * b, tetroShape_t type)
 	}
 	
 	//bad data,
-	if ( type != TETRO_I && type != TETRO_J && type != TETRO_L && type != TETRO_O && type != TETRO_S && type != TETRO_T && type != TETRO_Z )
+	if ( type != TETRO_I && type != TETRO_J && type != TETRO_L && type != TETRO_O && type != TETRO_S && type != TETRO_T && type != TETRO_Z && type != TETRO_DEAD )
 		return false;
 	else
 	{
@@ -459,6 +459,7 @@ boolean tetro_move(tetromino * t, dir_t dir)
 	}
 //===============================================
 
+
 /*
 	//make it so either all of the blocks will move in the direction, or none of them will
 	//blocks must be moved in the correct order to prevent tetromino from tripping over itself
@@ -582,6 +583,8 @@ boolean tetro_moveToStart(tetromino * t)
 	int i;
 	int x, y, type;
 	block * b;
+	block * blockThatWasAlreadyThere;
+	boolean result = true;
 	
 	type = tetro_getType(t);
 	
@@ -592,13 +595,18 @@ boolean tetro_moveToStart(tetromino * t)
 		y = startCoord[type].yCoord[i];
 		
 		if ( !block_teleport(b, x, y) )
-			return false;
+		{
+			//put the block there anyway so you see it placed on the screen as the game ends
+			result = false;
+			g_removeBlockFromPos( g_getBlockAtPos(x, y) );
+			block_teleport(b, x, y);
+		}
 	}
 	
 	if ( !tetro_doWake(t) )
 		debug_msg("[tetro_moveToStart]: tetromino already awake?\n");
 	
-	return true;
+	return result;
 }
 
 //rotates the tetromino 90 degrees clockwise. returns false if rotated position is blocked.

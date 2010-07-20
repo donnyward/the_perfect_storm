@@ -48,6 +48,10 @@ typedef struct gameModule
 	//for entering new high scores
 	char newHighScore[INITIALS_SIZE];
 	int highScoreIndexToReplace;
+	
+	//for counting frames during loss state
+	int lossFrame;
+	int lossCurrentRow;
 } gameModule;
 
 //===============================================

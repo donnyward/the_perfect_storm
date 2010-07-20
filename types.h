@@ -13,6 +13,7 @@
 #define X_MAX 9
 #define Y_MIN 0
 #define Y_MAX 17
+#define SIZE_ONE_DIMENSIONAL 180
 
 //the x and y coordinates of a block not yet in play yet (but created and awaiting entry)
 #define X_VOID 99
@@ -48,6 +49,9 @@
 #define DAS_PERIOD 5 //how often to move one notch while DAS'ing
 
 #define ASCII_A 1 //the numerical value of ascii char A. subtracted from char's to get proper array loc for chars[]
+
+#define LOSS_PAUSE 1500 //how long to pause when theres no room for the next block to enter the field
+#define GAME_OVER_PAUSE 3000 //how long to say game over
 //===============================================
 //Video settings
 //===============================================
@@ -142,6 +146,7 @@ typedef enum
 	TETRO_S,
 	TETRO_T,
 	TETRO_Z,
+	TETRO_DEAD, //for blocks that fill up on loss state
 	TETRO_RANDOM, //altered in tetro_create
 } tetroShape_t;
 
@@ -166,6 +171,7 @@ typedef enum
 	STATE_PLAYING,
 	//STATE_PAUSED, //same as menu
 	STATE_MENU,
+	STATE_LOSS, //when the game is lost. start filling up the field with blocks
 	STATE_IDLE, //do nothing
 } gamestate_t;
 
