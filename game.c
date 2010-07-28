@@ -106,16 +106,16 @@ int dropIntervalPerRow[] =
 	3
 };
 
-char numIcon0[] = "./pictures/NUM0.BMP";
-char numIcon1[] = "./pictures/NUM1.BMP";
-char numIcon2[] = "./pictures/NUM2.BMP";
-char numIcon3[] = "./pictures/NUM3.BMP";
-char numIcon4[] = "./pictures/NUM4.BMP";
-char numIcon5[] = "./pictures/NUM5.BMP";
-char numIcon6[] = "./pictures/NUM6.BMP";
-char numIcon7[] = "./pictures/NUM7.BMP";
-char numIcon8[] = "./pictures/NUM8.BMP";
-char numIcon9[] = "./pictures/NUM9.BMP";
+char numIcon0[] = "./pictures/NUM0.bmp";
+char numIcon1[] = "./pictures/NUM1.bmp";
+char numIcon2[] = "./pictures/NUM2.bmp";
+char numIcon3[] = "./pictures/NUM3.bmp";
+char numIcon4[] = "./pictures/NUM4.bmp";
+char numIcon5[] = "./pictures/NUM5.bmp";
+char numIcon6[] = "./pictures/NUM6.bmp";
+char numIcon7[] = "./pictures/NUM7.bmp";
+char numIcon8[] = "./pictures/NUM8.bmp";
+char numIcon9[] = "./pictures/NUM9.bmp";
 
 char blockIconI[] = "./pictures/BLOCK_I.bmp";
 char blockIconJ[] = "./pictures/BLOCK_J.bmp";

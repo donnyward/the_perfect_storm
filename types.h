@@ -68,7 +68,7 @@
 #define COLORKEY_G 0
 #define COLORKEY_B 83
 
-#define FLASH_FRAMES 8 //even number = last flash frame before disappear is "normal" unflashed block
+#define FLASH_FRAMES 8 //even number = last flash frame before disappear is BLOCK_FLASH1
 #define FLASH_INTERVAL 150
 
 #define NUMBER_LENGTH 20 //pixels
@@ -95,8 +95,8 @@
 #define HIGH_SCORES_GAP 20 //how much space in pixels between each high scores entry (vertical)
 
 //where on the screen to show your initials whilst entering your initials
-#define NEW_HIGH_SCORE_X 400
-#define NEW_HIGH_SCORE_Y 200
+#define NEW_HIGH_SCORE_X 290
+#define NEW_HIGH_SCORE_Y 220
 
 //locations for some pre baked text
 #define TEXT_GETREADY_X 195
@@ -128,6 +128,7 @@
 #define HIGH_SCORES_8 50000
 #define HIGH_SCORES_9 10000
 */
+//lower initial scores are for testing purposes
 #define HIGH_SCORES_0 1000
 #define HIGH_SCORES_1 900
 #define HIGH_SCORES_2 800

@@ -58,9 +58,11 @@ int main(int argc, char * argv[])
 	*/
 	if (isFullScreen)
 		screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, BIT_DEPTH, SDL_SWSURFACE | SDL_FULLSCREEN);
+	
 	else
 		screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, BIT_DEPTH, SDL_SWSURFACE);
 		
+	SDL_ShowCursor( SDL_DISABLE );
 	if (screen == NULL) //fail
 	{
 		printf("Error setting video mode to %dx%d, %d bit depth: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, BIT_DEPTH, SDL_GetError());
@@ -89,7 +91,7 @@ int main(int argc, char * argv[])
 	//checks for high scores list and creates default one if none found
 	checkHighScores();
 	
-//	SDL_Delay(2000); //wait, to see image for a bit
+	SDL_Delay(2000); //wait, to see image for a bit
 
 
 	m_init(); //setup menu
