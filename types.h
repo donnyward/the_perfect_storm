@@ -261,4 +261,15 @@ typedef struct
 	int height;
 } spriteLoc_t;
 
+typedef enum
+{
+	SND_MENUMOVE,
+	SND_MENUSELECT,
+	SND_ROTATE,
+	SND_MOVESIDEWAYS,
+	SND_DOWNBLOCKED,
+	SND_LINECLEAR,
+	SND_GAMEOVER,
+} sounds_e;
+
 #endif
