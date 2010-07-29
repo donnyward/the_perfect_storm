@@ -250,6 +250,12 @@ boolean m_move()
 				game.newHighScore[i] = ' ';
 			else //done entering initials
 			{
+				for ( i = HIGH_SCORES_LIST_SIZE-1; i > game.highScoreIndexToReplace; i-- )
+				{
+					strcpy(highScoresNameArray[i], highScoresNameArray[i-1]);
+					highScores.scores[i] = highScores.scores[i-1];
+				}
+				
 				strcpy(highScoresNameArray[game.highScoreIndexToReplace], game.newHighScore);
 				highScores.scores[game.highScoreIndexToReplace] = game.score;
 				
