@@ -355,7 +355,7 @@ tetromino * tetro_create(tetroShape_t type)
 	{
 		//random number from 0 to 6
 		random = (rand()/(RAND_MAX+1.0)) * (TETRO_SHAPES-1);
-		printf("[tetro_create]: random number = %d\n", random);
+		//printf("[tetro_create]: random number = %d\n", random);
 		type = random;
 		
 	//	type = TETRO_S;
@@ -393,7 +393,7 @@ boolean tetro_clear(tetromino * t)
 		b = t->children[i];
 		if ( !block_doSleep(b) ) //put child to sleep
 		{
-			printf("[tetro_clear]: one of the children was already asleep! weird\n");
+			//printf("[tetro_clear]: one of the children was already asleep! weird\n");
 			//return false;
 		}
 			
@@ -632,7 +632,7 @@ boolean tetro_rotate(tetromino * t)
 	else
 		rotationIndex = t->rotation + 1;
 
-	printf("[tetro_rotate]: starting rotation = %d\n", t->rotation);
+	//printf("[tetro_rotate]: starting rotation = %d\n", t->rotation);
 	
 	//successful rotate means the end positions for all 3 non pivot blocks are NULL
 	for ( i = 0; i < TETRO_SIZE; i++ )
@@ -669,7 +669,7 @@ boolean tetro_rotate(tetromino * t)
 				break;
 		}
 
-		printf("[tetro_rotate]: getting block at (%d, %d)\n", xDest[i], yDest[i]);
+		//printf("[tetro_rotate]: getting block at (%d, %d)\n", xDest[i], yDest[i]);
 		if ( g_isLocOutOfBounds(xDest[i], yDest[i]) )
 			doRotate = false;
 		else
@@ -711,7 +711,7 @@ boolean tetro_rotate(tetromino * t)
 		
 		t->rotation = rotationIndex;
 			
-		printf("[tetro_rotate]: new rotation = %d\n", t->rotation);
+		//printf("[tetro_rotate]: new rotation = %d\n", t->rotation);
 	}
 	return doRotate;
 }

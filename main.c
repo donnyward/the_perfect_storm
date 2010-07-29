@@ -108,14 +108,14 @@ void checkHighScores()
 	
 	if (f != NULL)
 	{
-		printf("[checkHighScores]: hs.dat already exists!\n");
+		debug_msg("[checkHighScores]: hs.dat already exists!\n");
 		
 		fread(&highScores, sizeof(highScoresStruct_t), 1, f);
 
 	}
 	else
 	{
-		printf("[checkHighScores]: creating new hs.dat... \n");
+		debug_msg("[checkHighScores]: creating new hs.dat... \n");
 		f = fopen("hs.dat", "wb");
 		
 		strcpy(data.name0, "KKD");
