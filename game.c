@@ -7,6 +7,7 @@
 
 #include "menu.h"
 
+#include <time.h>
 extern SDL_Surface * screen; //the screen surface. originally declared in main.c
 //SDL_Surface * image; //used by g_drawGame()
 extern menu_t menu; //needed in this file to set its values in g_handleInput()
@@ -326,7 +327,7 @@ void g_create()
 	//background
 	image = g_loadImage("./pictures/gamescreen.bmp");
 	if (image == NULL)
-		printf("[g_drawGame]: error loading an image!\n");
+		debug_msg("[g_drawGame]: error loading an image!\n");
 	g_addSurface(0, 0, image, screen, NULL);
 	SDL_FreeSurface(image);
 	
@@ -342,6 +343,9 @@ void g_create()
 	g_addSurface(TEXT_GETREADY_X, TEXT_GETREADY_Y, image, screen, NULL);
 	SDL_FreeSurface(image);
 	SDL_Flip(screen);
+	
+	//make random numbers more random
+	srand( time(NULL) );
 	
 	SDL_Delay(2000); //2 seconds
 	
@@ -733,7 +737,7 @@ void g_updateGame()
 
 			if ( !tetro_move(game.current, DIR_SOUTH) ) //the periodic drop down was blocked
 			{
-				printf("[g_updateGame]: periodic drop down blocked!\n");
+				//printf("[g_updateGame]: periodic drop down blocked!\n");
 				g_onDownBlocked();
 			}
 			//game.lastDropTime = game.currentTime;
@@ -744,11 +748,11 @@ void g_updateGame()
 		//rotate has priority
 		if ( game.current->tryRotate )
 		{
-			printf("[g_updateGame]: trying rotate...\n");
+			debug_msg("[g_updateGame]: trying rotate...\n");
 			if ( tetro_rotate(game.current) )
-				printf("[g_updateGame]: rotate success!\n");
+				debug_msg("[g_updateGame]: rotate success!\n");
 			else
-				printf("[g_updateGame]: rotate failed!\n");
+				debug_msg("[g_updateGame]: rotate failed!\n");
 		}
 		
 		//for delayed auto shifting
@@ -866,7 +870,7 @@ void g_updateGame()
 					
 						b = block_create(TETRO_DEAD, NULL);
 						if ( !block_teleport(b, i, game.lossCurrentRow) )
-							printf("[g_updateGame]: STATE_LOSS- error teleporting dead block into position!\n");
+							debug_msg("[g_updateGame]: STATE_LOSS- error teleporting dead block into position!\n");
 						b = NULL;
 					}
 					game.lossCurrentRow++;
@@ -877,7 +881,7 @@ void g_updateGame()
 		game.lossFrame++;
 	}		
 	else
-		printf("[g_updateGame]: unknown game.state!\n");
+		debug_msg("[g_updateGame]: unknown game.state!\n");
 	
 	menu.nextMoveDir = DIR_NONE;
 }
@@ -1012,7 +1016,7 @@ void g_drawGame()
 		image = g_loadImage("./pictures/gamescreen.bmp");
 		
 		if (image == NULL)
-			printf("[g_drawGame]: error loading an image!\n");
+			debug_msg("[g_drawGame]: error loading an image!\n");
 			
 		g_addSurface(0, 0, image, screen, NULL);
 		SDL_FreeSurface(image);
@@ -1102,7 +1106,7 @@ void g_drawGame()
 
 					if (image == NULL)
 					{
-						printf("[g_drawGame]: failed to load block image!\n");
+						debug_msg("[g_drawGame]: failed to load block image!\n");
 					}
 					g_getImageCoords(i, j, &x, &y);
 					g_addSurface(x, y, image, screen, NULL);
@@ -1113,7 +1117,7 @@ void g_drawGame()
 		}
 	}
 	else
-		printf("[g_drawGame]: unrecognized game.state!\n");
+		debug_msg("[g_drawGame]: unrecognized game.state!\n");
 		
 	
 	SDL_Flip(screen);
@@ -1147,26 +1151,26 @@ void g_clearGrid()
 			
 			if ( b == NULL )
 			{
-				printf("[g_clearGrid]: no block located at (%d, %d)\n", x, y);
+				//printf("[g_clearGrid]: no block located at (%d, %d)\n", x, y);
 			}
 			else
 			{
 				if ( !block_clear(b) )
 				{
-					printf("[g_clearGrid]: block failed to clear! Clearing parent tetromino first...\n");
+					//printf("[g_clearGrid]: block failed to clear! Clearing parent tetromino first...\n");
 					tetro_clear(block_getParent(b));
 					if ( !block_clear(b) )
-						printf("[g_clearGrid]: block STILL failed to clear! WTF?\n");
+						debug_msg("[g_clearGrid]: block STILL failed to clear! WTF?\n");
 					else
 					{
 						game.pos[x][y] = NULL;
-						printf("[g_clearGrid]: game.pos[%d][%d] set to NULL!\n", x, y);
+						//printf("[g_clearGrid]: game.pos[%d][%d] set to NULL!\n", x, y);
 					}
 				}
 				else
 				{
 					game.pos[x][y] = NULL;
-					printf("[g_clearGrid]: game.pos[%d][%d] set to NULL!\n", x, y);
+					//printf("[g_clearGrid]: game.pos[%d][%d] set to NULL!\n", x, y);
 				}
 				//debug_msg("after if/else branches\n");
 			}
@@ -1192,34 +1196,36 @@ void g_onDownBlocked()
 		-1, -1, -1, -1
 	};
 	
-	printf("[g_onDownBlocked]!\n");
+	debug_msg("[g_onDownBlocked]!\n");
 
 	
 	//calculate / move down lines here
 	//only check the rows that the tetromino is/was at when it stopped
 	//the above blocks only move down the number of rows equal to those cleared
 	tetro_getRows(game.current, &rowTop, &rowBottom);
-	printf("[g_onDownBlocked]: rowTop: %d, rowBottom: %d\n", rowTop, rowBottom);
+	//printf("[g_onDownBlocked]: rowTop: %d, rowBottom: %d\n", rowTop, rowBottom);
 	
 	if ( !tetro_clear(game.current) )
 	{
-		printf("[g_onDownBlocked]: game.current failed to clear!\n");
+		debug_msg("[g_onDownBlocked]: game.current failed to clear!\n");
 	}
 	
 	for ( i = rowBottom; i <= rowTop; i++ )
 	{
 		if ( g_checkFullRow(i) )
 		{
-			printf("[g_onDownBlocked]: full row at %d!\n", i);
+			//printf("[g_onDownBlocked]: full row at %d!\n", i);
 			fullRows[count] = i;
 			count++;
 			game.lines++;
 		}
 		else
-			printf("[g_onDownBlocked]: no full row at %d!\n", i);
+		{
+			//printf("[g_onDownBlocked]: no full row at %d!\n", i);
+		}
 	}
 	
-	printf("[g_onDownBlocked]: number of rows filled = %d\n", count);
+	//printf("[g_onDownBlocked]: number of rows filled = %d\n", count);
 	
 	switch (count)
 	{
@@ -1245,7 +1251,7 @@ void g_onDownBlocked()
 	//full line(s) exist, flash them then remove, then drop above blocks down
 	if ( count > 0 )
 	{
-		printf("[g_onDownBlocked]: start flashing\n");
+		debug_msg("[g_onDownBlocked]: start flashing\n");
 		//k = index for a row to flash
 		//i = current x position
 		//j = y position (row). fullRows[k]
@@ -1278,7 +1284,7 @@ void g_onDownBlocked()
 		SDL_FreeSurface(flash1);
 		SDL_FreeSurface(flash2);
 		
-		printf("[g_onDownBlocked]: finished flashing\n");
+		debug_msg("[g_onDownBlocked]: finished flashing\n");
 		
 		//remove all those blocks
 		for ( k = 0; k < count; k++ )
@@ -1288,9 +1294,13 @@ void g_onDownBlocked()
 				b = g_getBlockAtPos(i, fullRows[k]);
 				g_removeBlockFromPos(b);
 				if ( block_clear(b) )
-					printf("[g_onDownBlocked]: block at (%d, %d) removed\n", i, fullRows[k]);
+				{
+					//printf("[g_onDownBlocked]: block at (%d, %d) removed\n", i, fullRows[k]);
+				}
 				else
-					printf("[g_onDownBlocked]: no block removed at (%d, %d)\n", i, fullRows[k]);
+				{
+					//printf("[g_onDownBlocked]: no block removed at (%d, %d)\n", i, fullRows[k]);
+				}
 			}
 		}
 		
@@ -1322,7 +1332,7 @@ boolean g_checkFullRow(int row)
 	
 	for ( i = 0; i < SIZE_X; i++ )
 	{
-		printf("[g_checkFullRow]: checking row %d, column %d\n", row, i);
+		//printf("[g_checkFullRow]: checking row %d, column %d\n", row, i);
 		if ( g_getBlockAtPos(i, row) == NULL )
 			return false;
 	}
@@ -1352,11 +1362,11 @@ void g_dropAboveBlocksDown(int startRow, int count)
 				{
 					if ( block_move(b, DIR_SOUTH) )
 					{
-						printf("[g_dropAboveBlocksDown]: block at (%d, %d) moved down!\n", j, currentRow);
+						//printf("[g_dropAboveBlocksDown]: block at (%d, %d) moved down!\n", j, currentRow);
 					}
 					else
 					{
-						printf("[g_dropAboveBlocksDown]: block at (%d, %d) could not move down!\n", j, currentRow);
+						//printf("[g_dropAboveBlocksDown]: block at (%d, %d) could not move down!\n", j, currentRow);
 					}
 				}
 			}
