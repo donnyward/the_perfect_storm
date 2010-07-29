@@ -274,6 +274,7 @@ void g_clear(gameOverReason_t r)
 			if (game.score > highScores.scores[i])
 			{
 				newHighScore = true;
+				game.highScoreIndexToReplace = i;
 				break;
 			}
 		}
@@ -294,7 +295,6 @@ void g_clear(gameOverReason_t r)
 		game.newHighScore[1] = 0;
 		game.newHighScore[2] = 0;
 		game.newHighScore[3] = 0;
-		game.highScoreIndexToReplace = i;
 	}
 	else
 		m_init();
