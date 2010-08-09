@@ -196,6 +196,8 @@ extern Mix_Chunk * menuSelect;
 extern Mix_Chunk * moveSideways;
 extern Mix_Chunk * rotate;
 
+//sounds_e menuSound = SND_NONE;
+
 int g_getScore()
 {
 	return game.score;
@@ -729,11 +731,27 @@ void g_updateGame()
 	}
 	else if (game.state == STATE_MENU)
 	{	
+		//menuSound = m_move;
+		
+		switch ( m_move() )
+		{
+			case SND_MENUMOVE:
+				s_playSound(menuMove);
+				break;
+			case SND_MENUSELECT:
+				s_playSound(menuSelect);
+				break;
+			case SND_NONE:
+			default:
+				break;
+		}
+		/*
 		if ( !m_move() )
 		{
 			//too much output
 			//printf("[g_updateGame]: m_move returned false!\n");
 		}
+		*/
 	}
 	else if (game.state == STATE_PLAYING)
 	{	

@@ -16,14 +16,14 @@ extern Mix_Chunk * moveSideways;
 extern Mix_Chunk * rotate;
 
 extern Mix_Chunk * sound_effects[];
-boolean m_move()
+sounds_e m_move()
 {
 	int i;
 	FILE * f; //for amending high scores
 	sounds_e soundEffect = SND_NONE;
 	
 	if (menu.nextMoveDir == DIR_NONE)
-		return false;
+		return SND_NONE;
 		
 	if (menu.nextMoveDir == DIR_NORTH) //go up
 	{
@@ -39,6 +39,7 @@ boolean m_move()
 		else if (menu.menuLoc == M_HIGHSCORES)
 		{
 			//do nothing
+			soundEffect = SND_NONE;
 		}
 		else if (menu.menuLoc == M_NEWHIGH)
 		{
@@ -77,7 +78,7 @@ boolean m_move()
 		else
 		{
 			printf("[m_move]: Up pushed, unhandled menu.menuLoc '%d'!\n", menu.menuLoc);
-			return false;
+			return SND_NONE;
 		}
 	}
 	else if (menu.nextMoveDir == DIR_SOUTH) //go down
@@ -94,6 +95,7 @@ boolean m_move()
 		else if (menu.menuLoc == M_HIGHSCORES)
 		{
 			//do nothing
+			soundEffect = SND_NONE;
 		}
 		else if (menu.menuLoc == M_NEWHIGH)
 		{
@@ -132,7 +134,7 @@ boolean m_move()
 		else
 		{
 			printf("[m_move]: Down pushed, unhandled menu.menuLoc '%d'!\n", menu.menuLoc);
-			return false;
+			return SND_NONE;
 		}
 	}
 	else if (menu.nextMoveDir == DIR_EAST) //go in
@@ -194,7 +196,7 @@ boolean m_move()
 		else
 		{
 			printf("[m_move]: Enter pushed, unhandled menu.currentSelection '%d'!\n", menu.currentSelection);
-			return false;
+			return SND_NONE;
 		}
 	}
 	else if (menu.nextMoveDir == DIR_WEST) //go out
@@ -216,6 +218,7 @@ boolean m_move()
 		else if (menu.menuLoc == M_NEWHIGH)
 		{
 			//do nothing
+			soundEffect = SND_NONE;
 		}
 		else if (menu.menuLoc == M_PAUSE)
 		{
@@ -236,14 +239,14 @@ boolean m_move()
 		else
 		{
 			printf("[m_move]: ESC pushed, unhandled menu.menuLoc '%d'!\n", menu.menuLoc);
-			return false;
+			return SND_NONE;
 		}
 	}
 	else if (menu.nextMoveDir == DIR_NORTHWEST) //go left (hack for entering initials in event of new high score)
 	{
-		soundEffect = SND_MENUMOVE;
 		if (menu.menuLoc == M_NEWHIGH)
 		{
+			soundEffect = SND_MENUMOVE;
 			i = 0;
 			while (game.newHighScore[i] != 0)
 				i++;
@@ -259,9 +262,9 @@ boolean m_move()
 	}
 	else if (menu.nextMoveDir == DIR_NORTHEAST) //go right
 	{
-		soundEffect = SND_MENUMOVE;
 		if (menu.menuLoc == M_NEWHIGH)
 		{
+			soundEffect = SND_MENUMOVE;
 			i = 0;
 			while (game.newHighScore[i] != 0)
 				i++;
@@ -287,13 +290,13 @@ boolean m_move()
 			}
 		}
 	}
-	
+	/*
 	if (soundEffect == SND_MENUMOVE)
 		s_playSound(menuMove);
 	else if (soundEffect == SND_MENUSELECT)
 		s_playSound(menuSelect);
-		
-	return true;
+	*/
+	return soundEffect;
 }
 
 boolean m_highScores(highScoresReason_t r)
