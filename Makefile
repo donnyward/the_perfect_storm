@@ -14,7 +14,7 @@ EXECUTABLE = ps
 #	$(CC) $(OBJECTS) -o $(EXECUTABLE) $(LIBS)
 	
 game : $(OBJECTS)
-	gcc $(OBJECTS)  `sdl-config --cflags --libs` -o ps 
+	gcc $(OBJECTS) -o ps `sdl-config --cflags --libs` -lSDL_mixer
 	
 main.o : main.c
 	gcc -c main.c

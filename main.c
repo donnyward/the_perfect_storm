@@ -2,7 +2,6 @@
 #include "types.h"
 #include "SDL/SDL.h"
 
-
 SDL_Surface * screen;
 highScoresStruct_t highScores;
 char * highScoresNameArray[] = 
@@ -19,7 +18,9 @@ char * highScoresNameArray[] =
 	highScores.name9
 };
 
-int debug_mode = 0;
+int debug_mode = 1;
+
+
 
 void checkHighScores();
 
@@ -41,8 +42,8 @@ int main(int argc, char * argv[])
 
 
 	printf("Loading SDL...\n");
-	//init screen surface
-	if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) != 0 ) //init basics (event handling, filei/o and threading) + video + timer (for constant update rate)
+	//init basics (event handling, filei/o and threading) + video + timer (for constant update rate) + audio
+	if ( SDL_Init( SDL_INIT_EVERYTHING ) != 0 ) //SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO
 	{
 		printf("Error initializing SDL. Reason: %s\n", SDL_GetError()); // <1 = fail
 		return false;
@@ -66,6 +67,12 @@ int main(int argc, char * argv[])
 	if (screen == NULL) //fail
 	{
 		printf("Error setting video mode to %dx%d, %d bit depth: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, BIT_DEPTH, SDL_GetError());
+		return false;
+	}
+	
+	if ( !s_init() )
+	{
+		debug_msg("[main]: s_init failed\n");
 		return false;
 	}
 	

@@ -1,21 +1,34 @@
 #include "menu.h"
 #include <stdio.h>
+#include "SDL/SDL_mixer.h"
 
 menu_t menu;
 extern gameModule game;
 extern highScoresStruct_t highScores;
 extern char * highScoresNameArray[];
 
+extern Mix_Chunk * downBlock;
+extern Mix_Chunk * gameOver;
+extern Mix_Chunk * lineClear;
+extern Mix_Chunk * menuMove;
+extern Mix_Chunk * menuSelect;
+extern Mix_Chunk * moveSideways;
+extern Mix_Chunk * rotate;
+
+extern Mix_Chunk * sound_effects[];
 boolean m_move()
 {
 	int i;
 	FILE * f; //for amending high scores
+	sounds_e soundEffect = SND_NONE;
 	
 	if (menu.nextMoveDir == DIR_NONE)
 		return false;
 		
 	if (menu.nextMoveDir == DIR_NORTH) //go up
 	{
+		soundEffect = SND_MENUMOVE;
+		
 		if (menu.menuLoc == M_MAIN)
 		{
 			if (menu.currentSelection == S_NEWGAME)
@@ -69,6 +82,8 @@ boolean m_move()
 	}
 	else if (menu.nextMoveDir == DIR_SOUTH) //go down
 	{
+		soundEffect = SND_MENUMOVE;
+		
 		if (menu.menuLoc == M_MAIN)
 		{
 			if (menu.currentSelection == S_EXIT)
@@ -122,6 +137,7 @@ boolean m_move()
 	}
 	else if (menu.nextMoveDir == DIR_EAST) //go in
 	{
+		soundEffect = SND_MENUSELECT;
 		if (menu.currentSelection == S_NEWGAME)
 		{
 			//start new game
@@ -183,6 +199,8 @@ boolean m_move()
 	}
 	else if (menu.nextMoveDir == DIR_WEST) //go out
 	{
+		soundEffect = SND_MENUSELECT;
+		
 		if (menu.menuLoc == M_MAIN)
 		{
 			//ask if want to exit
@@ -223,6 +241,7 @@ boolean m_move()
 	}
 	else if (menu.nextMoveDir == DIR_NORTHWEST) //go left (hack for entering initials in event of new high score)
 	{
+		soundEffect = SND_MENUMOVE;
 		if (menu.menuLoc == M_NEWHIGH)
 		{
 			i = 0;
@@ -240,6 +259,7 @@ boolean m_move()
 	}
 	else if (menu.nextMoveDir == DIR_NORTHEAST) //go right
 	{
+		soundEffect = SND_MENUMOVE;
 		if (menu.menuLoc == M_NEWHIGH)
 		{
 			i = 0;
@@ -267,6 +287,12 @@ boolean m_move()
 			}
 		}
 	}
+	
+	if (soundEffect == SND_MENUMOVE)
+		s_playSound(menuMove);
+	else if (soundEffect == SND_MENUSELECT)
+		s_playSound(menuSelect);
+		
 	return true;
 }
 

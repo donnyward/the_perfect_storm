@@ -2,6 +2,7 @@
 #include "types.h"
 
 #include "SDL/SDL.h" //needed for all SDL apps
+#include "SDL/SDL_mixer.h"
 #include <stdio.h> //for prinf
 #include <stdlib.h> //for exit()
 
@@ -187,6 +188,14 @@ spriteLoc_t chars[CHAR_SIZE] =
 	{540,0,CHAR_WIDTH,CHAR_HEIGHT}, //SPACE
 };
 	
+extern Mix_Chunk * downBlock;
+extern Mix_Chunk * gameOver;
+extern Mix_Chunk * lineClear;
+extern Mix_Chunk * menuMove;
+extern Mix_Chunk * menuSelect;
+extern Mix_Chunk * moveSideways;
+extern Mix_Chunk * rotate;
+
 int g_getScore()
 {
 	return game.score;
@@ -305,6 +314,7 @@ void g_end()
 {
 	printf("Unloading SDL...\n");
 	SDL_Quit();
+	s_clean();
 }
 
 void g_create()
@@ -750,7 +760,10 @@ void g_updateGame()
 		{
 			debug_msg("[g_updateGame]: trying rotate...\n");
 			if ( tetro_rotate(game.current) )
+			{
 				debug_msg("[g_updateGame]: rotate success!\n");
+				s_playSound(rotate);
+			}
 			else
 				debug_msg("[g_updateGame]: rotate failed!\n");
 		}
@@ -828,6 +841,11 @@ void g_updateGame()
 				{
 					g_onDownBlocked();
 				}
+			}
+			else //successful move, check to see if i should play a sound
+			{
+				if ( game.dasFrame == 0 && game.dasDelaying == true )
+					s_playSound(moveSideways);
 			}
 		}
 		
@@ -1251,6 +1269,8 @@ void g_onDownBlocked()
 	//full line(s) exist, flash them then remove, then drop above blocks down
 	if ( count > 0 )
 	{
+		s_playSound(lineClear);
+		
 		debug_msg("[g_onDownBlocked]: start flashing\n");
 		//k = index for a row to flash
 		//i = current x position
@@ -1307,6 +1327,8 @@ void g_onDownBlocked()
 		//move downt he above blocks
 		g_dropAboveBlocksDown((fullRows[0])+1, count);
 	}
+	else
+		s_playSound(downBlock); //no line clear so just play stacking sound
 	
 	
 	
@@ -1323,6 +1345,8 @@ void g_onDownBlocked()
 		//then the screen fills up rapidly
 		game.lossFrame = -1;
 		game.lossCurrentRow = 0;
+		
+		s_playSound(gameOver);
 	}
 }
 
