@@ -37,6 +37,8 @@ typedef enum
 	//M_PAUSECONFIRMQUIT and M_EXIT menu choices
 	S_YES,
 	S_NO,
+	
+	S_IDLE, //do nothing
 } menuSelection_t;
 	
 

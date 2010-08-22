@@ -193,6 +193,10 @@ sounds_e m_move()
 				menu.currentSelection = S_EXIT;
 			}
 		}
+		else if (menu.currentSelection == S_IDLE) //probably viewing high scores at this time do nothing
+		{
+			soundEffect = SND_NONE;
+		}
 		else
 		{
 			printf("[m_move]: Enter pushed, unhandled menu.currentSelection '%d'!\n", menu.currentSelection);
@@ -223,6 +227,7 @@ sounds_e m_move()
 		else if (menu.menuLoc == M_PAUSE)
 		{
 			//resume game
+			game.state = STATE_PLAYING;
 		}
 		else if (menu.menuLoc == M_PAUSECONFIRMQUIT)
 		{
@@ -302,6 +307,7 @@ sounds_e m_move()
 boolean m_highScores(highScoresReason_t r)
 {
 	menu.menuLoc = M_HIGHSCORES;
+	menu.currentSelection = S_IDLE;
 	return true;
 }
 

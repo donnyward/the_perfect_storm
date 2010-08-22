@@ -303,6 +303,7 @@ void g_clear(gameOverReason_t r)
 	{
 		menu.nextMoveDir = DIR_NONE;
 		menu.menuLoc = M_NEWHIGH;
+		menu.currentSelection = S_IDLE,
 		game.newHighScore[0] = ' ';
 		game.newHighScore[1] = 0;
 		game.newHighScore[2] = 0;
@@ -854,15 +855,17 @@ void g_updateGame()
 			//attempt to move tetro in this direction
 			if ( !tetro_move(game.current, game.current->nextMoveDir) )
 			{
+				printf("move failed no sound\n");
 				//printf("[g_updateGame]: tetro_move failed!\n");
 				if ( game.current->nextMoveDir == DIR_SOUTH  || game.current->nextMoveDir == DIR_SOUTHWEST || game.current->nextMoveDir == DIR_SOUTHEAST )
 				{
 					g_onDownBlocked();
 				}
 			}
-			else //successful move, check to see if i should play a sound
+			else if ( game.current->nextMoveDir == DIR_WEST || game.current->nextMoveDir == DIR_EAST ) //successful move, check to see if i should play a sound
 			{
-				if ( game.dasFrame == 0 && game.dasDelaying == true )
+				printf("play move because move succeeded west or east\n");
+				//if ( game.dasFrame == 0 && game.dasDelaying == true )
 					s_playSound(moveSideways);
 			}
 		}
