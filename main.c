@@ -18,7 +18,7 @@ char * highScoresNameArray[] =
 	highScores.name9
 };
 
-int debug_mode = 1;
+int debug_mode = 0;
 
 
 

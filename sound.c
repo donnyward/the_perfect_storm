@@ -75,12 +75,12 @@ boolean s_playSound(Mix_Chunk * s)
 		
 	if ( Mix_PlayChannel(-1, s, 0) == -1 )
 	{
-		printf("[s_playSound]: failure!\n");
+		debug_msg("[s_playSound]: failure!\n");
 		return false;
 	}
 	else
 	{
-		printf("[s_playSound]: success!\n");
+		debug_msg("[s_playSound]: success!\n");
 		return true;
 	}
 }
