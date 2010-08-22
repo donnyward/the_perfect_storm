@@ -123,7 +123,7 @@
 
 //high scores list
 #define HIGH_SCORES_LIST_SIZE 10
-/*
+
 #define HIGH_SCORES_0 500000
 #define HIGH_SCORES_1 400000
 #define HIGH_SCORES_2 350000
@@ -134,7 +134,7 @@
 #define HIGH_SCORES_7 100000
 #define HIGH_SCORES_8 50000
 #define HIGH_SCORES_9 10000
-*/
+
 //lower initial scores are for testing purposes
 #define HIGH_SCORES_0 1000
 #define HIGH_SCORES_1 900
