@@ -2,6 +2,7 @@
 #include "types.h"
 
 #include "SDL/SDL.h" //needed for all SDL apps
+#include "SDL/SDL_mixer.h"
 #include <stdio.h> //for prinf
 #include <stdlib.h> //for exit()
 
@@ -187,6 +188,16 @@ spriteLoc_t chars[CHAR_SIZE] =
 	{540,0,CHAR_WIDTH,CHAR_HEIGHT}, //SPACE
 };
 	
+extern Mix_Chunk * downBlock;
+extern Mix_Chunk * gameOver;
+extern Mix_Chunk * lineClear;
+extern Mix_Chunk * menuMove;
+extern Mix_Chunk * menuSelect;
+extern Mix_Chunk * moveSideways;
+extern Mix_Chunk * rotate;
+
+//sounds_e menuSound = SND_NONE;
+
 int g_getScore()
 {
 	return game.score;
@@ -292,6 +303,7 @@ void g_clear(gameOverReason_t r)
 	{
 		menu.nextMoveDir = DIR_NONE;
 		menu.menuLoc = M_NEWHIGH;
+		menu.currentSelection = S_IDLE,
 		game.newHighScore[0] = ' ';
 		game.newHighScore[1] = 0;
 		game.newHighScore[2] = 0;
@@ -305,6 +317,7 @@ void g_end()
 {
 	printf("Unloading SDL...\n");
 	SDL_Quit();
+	s_clean();
 }
 
 void g_create()
@@ -719,11 +732,27 @@ void g_updateGame()
 	}
 	else if (game.state == STATE_MENU)
 	{	
+		//menuSound = m_move;
+		
+		switch ( m_move() )
+		{
+			case SND_MENUMOVE:
+				s_playSound(menuMove);
+				break;
+			case SND_MENUSELECT:
+				s_playSound(menuSelect);
+				break;
+			case SND_NONE:
+			default:
+				break;
+		}
+		/*
 		if ( !m_move() )
 		{
 			//too much output
 			//printf("[g_updateGame]: m_move returned false!\n");
 		}
+		*/
 	}
 	else if (game.state == STATE_PLAYING)
 	{	
@@ -750,7 +779,10 @@ void g_updateGame()
 		{
 			debug_msg("[g_updateGame]: trying rotate...\n");
 			if ( tetro_rotate(game.current) )
+			{
 				debug_msg("[g_updateGame]: rotate success!\n");
+				s_playSound(rotate);
+			}
 			else
 				debug_msg("[g_updateGame]: rotate failed!\n");
 		}
@@ -823,11 +855,18 @@ void g_updateGame()
 			//attempt to move tetro in this direction
 			if ( !tetro_move(game.current, game.current->nextMoveDir) )
 			{
+				printf("move failed no sound\n");
 				//printf("[g_updateGame]: tetro_move failed!\n");
 				if ( game.current->nextMoveDir == DIR_SOUTH  || game.current->nextMoveDir == DIR_SOUTHWEST || game.current->nextMoveDir == DIR_SOUTHEAST )
 				{
 					g_onDownBlocked();
 				}
+			}
+			else if ( game.current->nextMoveDir == DIR_WEST || game.current->nextMoveDir == DIR_EAST ) //successful move, check to see if i should play a sound
+			{
+				printf("play move because move succeeded west or east\n");
+				//if ( game.dasFrame == 0 && game.dasDelaying == true )
+					s_playSound(moveSideways);
 			}
 		}
 		
@@ -1251,6 +1290,8 @@ void g_onDownBlocked()
 	//full line(s) exist, flash them then remove, then drop above blocks down
 	if ( count > 0 )
 	{
+		s_playSound(lineClear);
+		
 		debug_msg("[g_onDownBlocked]: start flashing\n");
 		//k = index for a row to flash
 		//i = current x position
@@ -1307,6 +1348,8 @@ void g_onDownBlocked()
 		//move downt he above blocks
 		g_dropAboveBlocksDown((fullRows[0])+1, count);
 	}
+	else
+		s_playSound(downBlock); //no line clear so just play stacking sound
 	
 	
 	
@@ -1323,6 +1366,8 @@ void g_onDownBlocked()
 		//then the screen fills up rapidly
 		game.lossFrame = -1;
 		game.lossCurrentRow = 0;
+		
+		s_playSound(gameOver);
 	}
 }
 

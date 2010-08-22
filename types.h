@@ -107,6 +107,13 @@
 #define TEXT_GAMEOVER_Y 100
 
 //===============================================
+//Audio
+//===============================================
+
+#define FREQUENCY 44100
+#define SAMPLE_SIZE 4096
+
+//===============================================
 //Scoring
 //===============================================
 #define SCORE_MODIFIER_ONE_LINES 40
@@ -260,5 +267,17 @@ typedef struct
 	int width;
 	int height;
 } spriteLoc_t;
+
+typedef enum
+{
+	SND_MENUMOVE,
+	SND_MENUSELECT,
+	SND_ROTATE,
+	SND_MOVESIDEWAYS,
+	SND_DOWNBLOCKED,
+	SND_LINECLEAR,
+	SND_GAMEOVER,
+	SND_NONE,
+} sounds_e;
 
 #endif

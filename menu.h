@@ -37,6 +37,8 @@ typedef enum
 	//M_PAUSECONFIRMQUIT and M_EXIT menu choices
 	S_YES,
 	S_NO,
+	
+	S_IDLE, //do nothing
 } menuSelection_t;
 	
 
@@ -56,7 +58,8 @@ typedef struct
 //handles the updating of the menu
 //moves the menu selection to the direction specified by menu.nextMove
 //can also specify a specific menu option to highlight/select, (for use with mouse pointer highlighting)
-boolean m_move();
+//returns the enum of the sound that should be played for the movement (including no sound)
+sounds_e m_move();
 
 //called when no input is entered for a long time, or entered in the menu.
 //displays high scores until input is received (if called with enter),
