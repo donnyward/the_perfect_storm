@@ -40,6 +40,16 @@ To do.
 | Move Tetromino Left/Right/Down | Arrow keys |
 | Rotate Tetromino               | Spacebar   |
 
+## Building From Source
+
+### Required Dependencies
+
+make
+
+SDL
+
+SDL_mixer
+
 # License
 
-BSD
+See [LICENSE](LICENSE).
